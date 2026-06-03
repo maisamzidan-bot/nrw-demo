@@ -216,10 +216,10 @@ section { position: relative; overflow: hidden; z-index: 1; }
   align-items: center; justify-content: center;
   text-align: center; padding: 7rem 2rem 5rem;
   background:
-    radial-gradient(ellipse 120% 65% at 50% -10%, rgba(18,85,160,0.55) 0%, transparent 62%),
-    radial-gradient(ellipse 60%  45% at 5%   95%,  rgba(0,200,216,0.12) 0%, transparent 55%),
-    radial-gradient(ellipse 45%  35% at 98%  60%,  rgba(18,85,160,0.18) 0%, transparent 50%),
-    linear-gradient(180deg, #010912 0%, #020e1c 50%, #030f1e 100%);
+    radial-gradient(ellipse 120% 65% at 50% -10%, rgba(18,85,160,0.65) 0%, transparent 62%),
+    radial-gradient(ellipse 60%  45% at 5%   95%,  rgba(0,200,216,0.15) 0%, transparent 55%),
+    radial-gradient(ellipse 45%  35% at 98%  60%,  rgba(18,85,160,0.25) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(1,9,18,0.75) 0%, rgba(2,14,28,0.8) 50%, rgba(3,15,30,0.85) 100%);
 }
 
 /* Animated water lines */
@@ -744,6 +744,55 @@ h1,h2 { line-height: 1.15; }
 .type-head { transition: filter 0.3s; }
 .type-head:hover { filter: brightness(1.15); }
 
+
+/* ── COVER VIDEO BACKGROUND ── */
+#cover-video-bg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0.22;
+  z-index: 0;
+  filter: saturate(0.6) brightness(0.5);
+  pointer-events: none;
+}
+/* All cover children above video */
+#cover > *:not(#cover-video-bg):not(.water-lines) {
+  position: relative; z-index: 2;
+}
+#cover .water-lines { z-index: 1; }
+#cover { overflow: hidden; }
+
+/* Video section dividers */
+.video-divider {
+  position: relative; width: 100%; height: 280px;
+  overflow: hidden;
+}
+.video-divider video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0.28;
+  filter: saturate(0.5) brightness(0.45) hue-rotate(180deg);
+}
+.video-divider-overlay {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(
+    180deg,
+    var(--deep) 0%,
+    transparent 20%,
+    transparent 80%,
+    var(--abyss) 100%
+  );
+  display: flex; align-items: center; justify-content: center;
+}
+.video-divider-text {
+  font-family: var(--mono); font-size: 0.75rem;
+  letter-spacing: 0.25em; text-transform: uppercase;
+  color: rgba(85,174,224,0.7);
+  text-shadow: 0 0 20px rgba(26,127,212,0.6);
+  z-index: 2; position: relative;
+}
+
 </style>
 </head>
 <body>
@@ -929,6 +978,14 @@ document.addEventListener('click', e => {
      1. COVER
 ════════════════════════════════════════════════════════ -->
 <section id="cover">
+  <!-- Background video — Pexels free license -->
+  <video
+    id="cover-video-bg"
+    autoplay muted loop playsinline
+    preload="auto"
+    poster="https://images.pexels.com/videos/3999398/pexels-photo-3999398.jpeg?auto=compress&cs=tinysrgb&h=627&fit=crop&w=1200">
+    <source src="https://videos.pexels.com/video-files/3999398/3999398-hd_1920_1080_24fps.mp4" type="video/mp4">
+  </video>
   <div class="water-lines">
     <div class="water-line"></div><div class="water-line"></div>
     <div class="water-line"></div><div class="water-line"></div>
@@ -1445,6 +1502,16 @@ document.addEventListener('click', e => {
     </div>
   </div>
 </section>
+
+<!-- Video divider before Manila -->
+<div class="video-divider">
+  <video autoplay muted loop playsinline preload="auto">
+    <source src="https://videos.pexels.com/video-files/3999398/3999398-hd_1920_1080_24fps.mp4" type="video/mp4">
+  </video>
+  <div class="video-divider-overlay">
+    <div class="video-divider-text">كل نقطة تُحسب — كل م³ له ثمن</div>
+  </div>
+</div>
 
 <!-- ════════════════════════════════════════════════════════
      8. MANILA CASE STUDY
