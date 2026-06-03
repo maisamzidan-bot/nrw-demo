@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>رؤية الأردن 2040 — تخفيض المياه غير المدرة للإيرادات</title>
+<link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   DESIGN SYSTEM — Deep Water Palette
+═══════════════════════════════════════════════════════════ */
+:root {
+  --abyss:    #010912;
+  --deep:     #021120;
+  --ocean:    #041c30;
+  --wave:     #073048;
+  --current:  #1255a0;
+  --flow:     #1a7fd4;
+  --foam:     #55aee0;
+  --mist:     #a8d8f0;
+  --white:    #e8f4fd;
+  --dim:      rgba(168,216,240,0.3);
+  --sand:     #e8dcc8;
+  --coral:    #e84040;
+  --amber:    #f09000;
+  --gold:     #e8c040;
+  --green:    #18c870;
+  --teal:     #00c8d8;
+  --purple:   #7c4dff;
+  --serif:    'Scheherazade New', serif;
+  --sans:     'Cairo', sans-serif;
+  --body:     'Tajawal', sans-serif;
+  --mono:     'IBM Plex Mono', monospace;
+  --glass:    rgba(4,28,48,0.65);
+  --glass-b:  rgba(26,127,212,0.2);
+  --glow:     0 0 40px rgba(26,127,212,0.2);
+  --glow-sm:  0 0 16px rgba(26,127,212,0.3);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--body);
+  background: var(--abyss);
+  color: var(--white);
+  overflow-x: hidden;
+  direction: rtl;
+  cursor: default;
+}
+
+/* Animated global background gradient */
+body::before {
+  content:'';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 110% 55% at 50% -5%,  rgba(18,85,160,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 70%  40% at 0%   60%,  rgba(0,200,216,0.07) 0%, transparent 50%),
+    radial-gradient(ellipse 55%  45% at 100% 80%,  rgba(18,85,160,0.10) 0%, transparent 50%),
+    radial-gradient(ellipse 90%  70% at 50%  100%, rgba(4,28,48,0.9)    0%, transparent 100%);
+  animation: bgPulse 14s ease-in-out infinite alternate;
+}
+@keyframes bgPulse {
+  0%   { opacity: 0.8; }
+  100% { opacity: 1;   }
+}
+
+/* Water ripple cursor effect */
+.ripple {
+  position: fixed; pointer-events: none; z-index: 9999;
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 1px solid rgba(46,139,192,0.6);
+  transform: translate(-50%,-50%) scale(0);
+  animation: ripple-out 0.6s ease-out forwards;
+}
+@keyframes ripple-out {
+  to { transform: translate(-50%,-50%) scale(4); opacity: 0; }
+}
+
+/* ── NAVIGATION ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  height: 56px; display: flex; align-items: center;
+  justify-content: space-between; padding: 0 2.5rem;
+  background: rgba(2,13,24,0.88);
+  backdrop-filter: blur(20px) saturate(1.5);
+  border-bottom: 1px solid rgba(26,127,212,0.2);
+  box-shadow: 0 2px 40px rgba(18,85,160,0.18);
+  transition: background 0.3s;
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 0.75rem;
+  font-family: var(--mono); font-size: 0.72rem;
+  color: var(--foam); letter-spacing: 0.12em;
+}
+.nav-brand-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--flow);
+  box-shadow: 0 0 8px var(--flow);
+  animation: pulse-glow 2s infinite;
+}
+@keyframes pulse-glow {
+  0%,100%{box-shadow:0 0 8px var(--teal), 0 0 16px rgba(0,200,216,0.3)}
+  50%   {box-shadow:0 0 20px var(--flow),0 0 40px rgba(26,127,212,0.5), 0 0 60px rgba(0,200,216,0.2)}
+}
+.nav-links {
+  display: flex; gap: 2rem; list-style: none;
+}
+.nav-links a {
+  font-family: var(--sans); font-size: 0.78rem; font-weight: 600;
+  color: rgba(176,223,240,0.6); text-decoration: none;
+  transition: color 0.2s, text-shadow 0.2s;
+  letter-spacing: 0.03em;
+}
+.nav-links a:hover {
+  color: var(--white);
+  text-shadow: 0 0 12px rgba(46,139,192,0.8);
+}
+.nav-progress {
+  height: 2px; background: var(--flow);
+  position: fixed; top: 56px; left: 0; z-index: 501;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 8px var(--flow);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION BASE
+═══════════════════════════════════════════════════════════ */
+section { position: relative; overflow: hidden; z-index: 1; }
+
+/* ── GLASS CARD ── */
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-b);
+  border-radius: 18px;
+  backdrop-filter: blur(20px) saturate(1.5);
+  box-shadow: var(--glow), inset 0 1px 0 rgba(255,255,255,0.05);
+  transition: transform 0.35s, box-shadow 0.35s, border-color 0.35s;
+}
+.glass:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 60px rgba(26,127,212,0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+  border-color: rgba(26,127,212,0.4);
+}
+
+/* ── SHIMMER DIVIDER ── */
+.shimmer {
+  height: 1px; margin: 2.5rem 0;
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(26,127,212,0.6) 30%,
+    rgba(0,200,216,0.8) 50%, rgba(26,127,212,0.6) 70%, transparent 100%);
+  animation: shimmerMove 4s ease-in-out infinite;
+}
+@keyframes shimmerMove {
+  0%,100% { opacity:0.4; background-position: -200% center; }
+  50%      { opacity:1;   background-position:  200% center; }
+}
+
+/* ── WATER BADGE ── */
+.water-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.35rem 1rem; border-radius: 100px;
+  font-family: var(--mono); font-size: 0.68rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  background: rgba(26,127,212,0.12);
+  border: 1px solid rgba(26,127,212,0.3);
+  color: var(--foam);
+  backdrop-filter: blur(8px);
+}
+.water-badge::before {
+  content:''; width:6px; height:6px; border-radius:50%;
+  background: var(--teal);
+  box-shadow: 0 0 8px var(--teal);
+  animation: pulse-glow 2s infinite;
+}
+
+/* ── GLOW TEXT ── */
+.glow-text { filter: drop-shadow(0 0 20px rgba(26,127,212,0.5)); }
+.glow-coral { filter: drop-shadow(0 0 16px rgba(232,64,64,0.5)); }
+.glow-gold  { filter: drop-shadow(0 0 16px rgba(232,192,64,0.5)); }
+.glow-green { filter: drop-shadow(0 0 16px rgba(24,200,112,0.5)); }
+
+/* ── STAT GLOW ── */
+.stat-val { transition: text-shadow 0.3s; }
+.stat-val:hover { text-shadow: 0 0 30px currentColor; }
+
+.section-tag {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  padding: 0.32rem 1rem; border-radius: 100px;
+  margin-bottom: 1.25rem;
+}
+.tag-blue { background: rgba(26,110,173,0.2); color: var(--foam); border: 1px solid rgba(46,139,192,0.35); }
+.tag-gold { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+.tag-coral { background: rgba(224,92,68,0.15); color: var(--coral); border: 1px solid rgba(224,92,68,0.3); }
+.tag-green { background: rgba(45,184,122,0.15); color: var(--green); border: 1px solid rgba(45,184,122,0.3); }
+
+.reveal {
+  opacity: 0; transform: translateY(40px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ═══════════════════════════════════════════════════════════
+   1. COVER
+═══════════════════════════════════════════════════════════ */
+#cover {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 7rem 2rem 5rem;
+  background:
+    radial-gradient(ellipse 120% 65% at 50% -10%, rgba(18,85,160,0.55) 0%, transparent 62%),
+    radial-gradient(ellipse 60%  45% at 5%   95%,  rgba(0,200,216,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 45%  35% at 98%  60%,  rgba(18,85,160,0.18) 0%, transparent 50%),
+    linear-gradient(180deg, #010912 0%, #020e1c 50%, #030f1e 100%);
+}
+
+/* Animated water lines */
+.water-lines {
+  position: absolute; inset: 0; overflow: hidden; opacity: 0.06;
+}
+.water-line {
+  position: absolute; height: 1px; width: 140%;
+  background: linear-gradient(90deg, transparent 0%, var(--flow) 40%, var(--teal) 60%, transparent 100%);
+  animation: wave-scroll 8s linear infinite;
+  filter: blur(0.4px);
+}
+.water-line:nth-child(1){ top:20%; animation-delay:0s; animation-duration:9s; }
+.water-line:nth-child(2){ top:35%; animation-delay:-3s; animation-duration:11s; }
+.water-line:nth-child(3){ top:55%; animation-delay:-6s; animation-duration:8s; }
+.water-line:nth-child(4){ top:70%; animation-delay:-2s; animation-duration:13s; }
+.water-line:nth-child(5){ top:85%; animation-delay:-4s; animation-duration:10s; }
+@keyframes wave-scroll {
+  from { transform: translateX(-10%) skewX(-5deg); }
+  to   { transform: translateX(10%) skewX(5deg); }
+}
+
+.cover-ministry {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em;
+  color: var(--foam); padding: 0.4rem 1.2rem; border-radius: 100px;
+  border: 1px solid rgba(46,139,192,0.3);
+  background: rgba(26,110,173,0.1);
+  margin-bottom: 2rem;
+  animation: fadeDown 1s 0.2s both;
+}
+.cover-eyebrow {
+  font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--flow);
+  margin-bottom: 1.2rem;
+  animation: fadeDown 1s 0.3s both;
+}
+.cover-title {
+  font-family: var(--serif); font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 700; line-height: 1.1; margin-bottom: 0.5rem;
+  background: linear-gradient(145deg,
+    #e8f4fd 0%, #90caf9 25%, #29b6f6 55%, #00e5ff 80%, #80deea 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 40px rgba(26,127,212,0.45));
+  animation: fadeDown 1s 0.4s both;
+}
+.cover-title-en {
+  font-family: var(--mono); font-size: clamp(0.85rem, 2vw, 1.1rem);
+  color: var(--foam); opacity: 0.7; letter-spacing: 0.06em;
+  margin-bottom: 2rem;
+  animation: fadeDown 1s 0.5s both;
+}
+.cover-lead {
+  font-family: var(--body); font-size: clamp(1rem, 2.2vw, 1.25rem);
+  color: var(--mist); max-width: 680px; line-height: 1.9;
+  margin-bottom: 3.5rem;
+  animation: fadeDown 1s 0.6s both;
+}
+
+/* Stats row */
+.cover-stats {
+  display: flex; gap: 0; flex-wrap: wrap; justify-content: center;
+  border: 1px solid rgba(46,139,192,0.2); border-radius: 20px;
+  overflow: hidden; backdrop-filter: blur(12px);
+  background: rgba(4,21,37,0.6);
+  animation: fadeDown 1s 0.7s both;
+  max-width: 800px;
+}
+.cover-stat {
+  padding: 1.5rem 2.5rem; flex: 1; min-width: 160px;
+  border-left: 1px solid rgba(46,139,192,0.15);
+  text-align: center;
+}
+.cover-stat:last-child { border-left: none; }
+.stat-val {
+  font-family: var(--mono); font-size: 2.4rem; font-weight: 600;
+  color: var(--flow); display: block; line-height: 1;
+}
+.stat-val.red { color: var(--coral); }
+.stat-val.gold { color: var(--gold); }
+.stat-val.green { color: var(--green); }
+.stat-unit { font-size: 0.72rem; color: var(--foam); display: block; margin-top: 0.2rem; }
+.stat-lbl { font-size: 0.78rem; color: rgba(176,223,240,0.6); margin-top: 0.5rem; font-family: var(--sans); }
+
+.scroll-hint {
+  position: absolute; bottom: 2.5rem; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  color: rgba(176,223,240,0.4); font-size: 0.7rem; font-family: var(--mono);
+  animation: bob 3s ease-in-out infinite;
+}
+.scroll-hint::after {
+  content: ''; width: 1px; height: 40px;
+  background: linear-gradient(to bottom, rgba(46,139,192,0.6), transparent);
+}
+@keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(8px)} }
+@keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+
+/* ═══════════════════════════════════════════════════════════
+   2. JORDAN VISION 2040
+═══════════════════════════════════════════════════════════ */
+#vision {
+  min-height: 100vh; padding: 7rem 2rem;
+  background:
+    linear-gradient(180deg, var(--abyss) 0%, var(--deep) 50%, var(--ocean) 100%);
+  display: flex; align-items: center;
+}
+.vision-grid {
+  max-width: 1100px; margin: 0 auto; width: 100%;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 5rem;
+  align-items: center;
+}
+.vision-heading {
+  font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700; line-height: 1.2; margin-bottom: 1.5rem;
+  color: var(--white);
+}
+.vision-heading span { color: var(--gold); }
+.vision-text { font-size: 1.05rem; color: var(--mist); line-height: 2; margin-bottom: 2rem; }
+
+.vision-targets { display: flex; flex-direction: column; gap: 1rem; }
+.target-row {
+  display: flex; align-items: center; gap: 1.25rem;
+  padding: 1.1rem 1.5rem; border-radius: 12px;
+  background: rgba(26,110,173,0.08);
+  border: 1px solid rgba(46,139,192,0.15);
+  transition: all 0.3s;
+}
+.target-row:hover { background: rgba(26,110,173,0.15); border-color: rgba(46,139,192,0.35); }
+.target-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; flex-shrink: 0;
+}
+.target-icon.blue { background: rgba(26,110,173,0.2); }
+.target-icon.gold { background: rgba(201,168,76,0.15); }
+.target-icon.green { background: rgba(45,184,122,0.15); }
+.target-icon.coral { background: rgba(224,92,68,0.15); }
+.target-val { font-family: var(--mono); font-size: 1.4rem; font-weight: 600; }
+.target-val.blue-c { color: var(--flow); }
+.target-val.gold-c { color: var(--gold); }
+.target-val.green-c { color: var(--green); }
+.target-val.coral-c { color: var(--coral); }
+.target-desc { font-size: 0.88rem; color: var(--mist); line-height: 1.5; }
+
+/* Timeline */
+.timeline { position: relative; padding-right: 2rem; }
+.timeline::before {
+  content: ''; position: absolute; right: 0; top: 0; bottom: 0;
+  width: 2px; background: linear-gradient(to bottom, var(--flow), rgba(46,139,192,0.1));
+}
+.timeline-item { position: relative; margin-bottom: 2.5rem; }
+.timeline-item::before {
+  content: ''; position: absolute; right: -2.35rem; top: 0.4rem;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--flow); box-shadow: 0 0 12px var(--flow);
+}
+.timeline-year { font-family: var(--mono); font-size: 0.78rem; color: var(--flow); margin-bottom: 0.4rem; }
+.timeline-title { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 0.3rem; }
+.timeline-desc { font-size: 0.88rem; color: rgba(176,223,240,0.7); line-height: 1.7; }
+
+/* ═══════════════════════════════════════════════════════════
+   3. JORDAN WATER CRISIS
+═══════════════════════════════════════════════════════════ */
+#jordan {
+  min-height: 100vh; padding: 7rem 2rem;
+  background: linear-gradient(180deg, #e8f4fb 0%, #f4f9fd 100%);
+  color: #041525;
+}
+.jordan-inner { max-width: 1100px; margin: 0 auto; width: 100%; }
+.jordan-section-head { text-align: center; margin-bottom: 4rem; }
+.jordan-title {
+  font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 700; color: #041525; margin-bottom: 1rem;
+}
+.jordan-lead { font-size: 1.05rem; color: #2e5a7a; max-width: 680px; margin: 0 auto; line-height: 1.9; }
+
+.facts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 4rem; }
+.fact-card {
+  padding: 2rem 1.75rem; border-radius: 18px;
+  background: white; border: 1px solid rgba(46,139,192,0.15);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  text-align: center; transition: all 0.35s;
+  position: relative; overflow: hidden;
+}
+.fact-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--card-accent, var(--flow));
+}
+.fact-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(46,139,192,0.4);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+}
+.fact-num {
+  font-family: var(--mono); font-size: 3.5rem; font-weight: 600;
+  line-height: 1; display: block; margin-bottom: 0.5rem;
+}
+.fact-label { font-size: 0.92rem; font-weight: 700; color: #041525; margin-bottom: 0.4rem; }
+.fact-desc { font-size: 0.8rem; color: #4a7a9b; line-height: 1.6; }
+.fact-source { font-family: var(--mono); font-size: 0.65rem; color: #8ab4c8; margin-top: 0.75rem; }
+
+/* NRW comparison bar */
+.nrw-bar-section {
+  background: white; border-radius: 20px; padding: 2.5rem;
+  border: 1px solid rgba(46,139,192,0.2);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+.nrw-bar-title { font-family: var(--sans); font-size: 1.1rem; font-weight: 700; color: #041525; margin-bottom: 2rem; text-align: center; }
+.bar-compare { display: flex; flex-direction: column; gap: 1rem; }
+.bc-row { display: grid; grid-template-columns: 180px 1fr 70px; align-items: center; gap: 1rem; }
+.bc-label { font-size: 0.85rem; color: #2e5a7a; text-align: right; }
+.bc-track { height: 28px; background: #deeef7; border-radius: 6px; overflow: hidden; }
+.bc-fill {
+  height: 100%; border-radius: 6px;
+  display: flex; align-items: center; padding: 0 0.8rem;
+  font-family: var(--mono); font-size: 0.78rem; font-weight: 600; color: white;
+  transition: width 2s ease;
+}
+.bc-val { font-family: var(--mono); font-size: 0.85rem; font-weight: 600; text-align: left; }
+.bc-target-line { position: relative; }
+
+/* ═══════════════════════════════════════════════════════════
+   4. WHAT IS NRW
+═══════════════════════════════════════════════════════════ */
+#nrw-explainer {
+  min-height: 100vh; padding: 7rem 2rem;
+  background: linear-gradient(180deg, #f4f9fd 0%, #eaf4fb 100%);
+  color: #041525;
+}
+.explainer-inner { max-width: 1100px; margin: 0 auto; width: 100%; }
+.explainer-title {
+  font-family: var(--serif); font-size: clamp(2rem, 4.5vw, 3.2rem);
+  font-weight: 700; color: #041525; margin-bottom: 1rem; text-align: center;
+}
+.explainer-lead { font-size: 1rem; color: #2e5a7a; max-width: 640px; margin: 0 auto 3.5rem; line-height: 1.9; text-align: center; }
+
+/* Water balance visual */
+.water-balance {
+  display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 1px;
+  border-radius: 20px; overflow: hidden; margin-bottom: 3rem;
+  background: rgba(46,139,192,0.15);
+}
+.wb-col { padding: 2rem; background: rgba(4,21,37,0.8); }
+.wb-label { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--foam); margin-bottom: 0.8rem; }
+.wb-num { font-family: var(--mono); font-size: 2.5rem; font-weight: 600; line-height: 1; margin-bottom: 0.4rem; }
+.wb-desc { font-size: 0.82rem; color: var(--mist); line-height: 1.7; }
+
+/* 3 types cards */
+.types-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.type-card {
+  border-radius: 18px; overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.type-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+.type-head { padding: 1.5rem 1.75rem; }
+.type-num { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.12em; opacity: 0.8; margin-bottom: 0.5rem; }
+.type-title { font-size: 1.2rem; font-weight: 800; color: white; }
+.type-body { background: white; padding: 1.5rem 1.75rem; border: 1px solid rgba(46,139,192,0.12); border-top: none; }
+.type-pct { font-family: var(--mono); font-size: 2.5rem; font-weight: 600; margin-bottom: 0.3rem; }
+.type-desc { font-size: 0.88rem; color: #2e5a7a; line-height: 1.7; margin-bottom: 1rem; }
+.type-examples { font-size: 0.8rem; }
+.type-example { padding: 0.3rem 0; color: #4a7a9b; display: flex; align-items: center; gap: 0.5rem; }
+.type-example::before { content: '→'; opacity: 0.5; }
+.type-example.solution {
+  color: #041525; font-weight: 700;
+  background: #e8f4fb; margin: 0.5rem -0.5rem 0;
+  padding: 0.5rem 0.8rem; border-radius: 6px;
+  border-right: 3px solid var(--flow);
+}
+.type-example.solution::before { content: '✓'; opacity: 1; color: var(--flow); }
+
+/* ═══════════════════════════════════════════════════════════
+   5. WEBMAP
+═══════════════════════════════════════════════════════════ */
+#webmap-section {
+  min-height: 100vh; padding: 7rem 2rem;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(18,85,160,0.18) 0%, transparent 65%),
+    linear-gradient(180deg, #021220 0%, #010912 100%);
+}
+.webmap-inner { max-width: 1300px; margin: 0 auto; width: 100%; }
+.map-embed {
+  border-radius: 24px; overflow: hidden;
+  border: 1px solid rgba(26,127,212,0.35);
+  box-shadow:
+    0 0 0 1px rgba(0,200,216,0.1),
+    0 8px 80px rgba(18,85,160,0.4),
+    0 0 120px rgba(26,127,212,0.08) inset;
+  margin-top: 2.5rem;
+  position: relative;
+  transition: box-shadow 0.4s;
+}
+.map-embed:hover {
+  box-shadow:
+    0 0 0 1px rgba(0,200,216,0.2),
+    0 12px 100px rgba(18,85,160,0.5),
+    0 0 140px rgba(26,127,212,0.12) inset;
+}
+/* Animated top-edge glow */
+.map-embed::before {
+  content:''; position:absolute; top:0; left:5%; right:5%;
+  height:1px; z-index:2;
+  background: linear-gradient(90deg,
+    transparent, rgba(0,200,216,0.8), rgba(26,127,212,1), rgba(0,200,216,0.8), transparent);
+  animation: mapGlow 3s ease-in-out infinite;
+}
+@keyframes mapGlow { 0%,100%{opacity:0.5} 50%{opacity:1} }
+.map-embed iframe { width: 100%; height: 600px; border: none; display: block; }
+.map-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.85rem 1.75rem;
+  background: rgba(1,9,18,0.98);
+  font-family: var(--mono); font-size: 0.7rem;
+  color: rgba(85,174,224,0.45);
+  border-top: 1px solid rgba(26,127,212,0.1);
+}
+.map-footer a {
+  color: var(--teal); text-decoration: none;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+.map-footer a:hover { color: var(--white); text-shadow: 0 0 12px var(--teal); }
+
+/* ═══════════════════════════════════════════════════════════
+   6. DMA ZONES
+═══════════════════════════════════════════════════════════ */
+#dma-section {
+  min-height: 100vh; padding: 7rem 2rem;
+  background:
+    radial-gradient(ellipse 70% 45% at 80% 20%, rgba(201,168,76,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(18,85,160,0.10) 0%, transparent 55%),
+    linear-gradient(180deg, #021220 0%, #010912 100%);
+}
+.dma-inner { max-width: 1300px; margin: 0 auto; width: 100%; }
+#leaflet-dma { width: 100%; height: 500px; border-radius: 16px; margin-top: 2rem; }
+.dma-legend {
+  display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 1rem;
+  justify-content: center;
+}
+.legend-pill {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-family: var(--mono); font-size: 0.72rem; color: var(--mist);
+  background: rgba(4,21,37,0.7); padding: 0.4rem 1rem;
+  border-radius: 100px; border: 1px solid rgba(255,255,255,0.08);
+}
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* Zone chips scroll */
+.zone-chips {
+  display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem;
+}
+.zone-chip {
+  padding: 0.6rem 1.1rem; border-radius: 100px;
+  font-family: var(--mono); font-size: 0.75rem; font-weight: 600;
+  border: 1px solid; cursor: pointer; transition: all 0.2s;
+  white-space: nowrap;
+}
+.zone-chip:hover { transform: scale(1.05); }
+
+/* ═══════════════════════════════════════════════════════════
+   7. DASHBOARD
+═══════════════════════════════════════════════════════════ */
+#dashboard-section {
+  min-height: 100vh; padding: 7rem 2rem;
+  background: var(--abyss);
+}
+.dash-inner { max-width: 1400px; margin: 0 auto; width: 100%; }
+.dash-embed {
+  border-radius: 20px; overflow: hidden;
+  border: 1px solid rgba(46,139,192,0.2);
+  box-shadow: 0 8px 60px rgba(0,0,0,0.7);
+  margin-top: 2rem;
+}
+.dash-embed iframe { width: 100%; height: 720px; border: none; display: block; }
+
+/* ═══════════════════════════════════════════════════════════
+   8. CALL TO ACTION
+═══════════════════════════════════════════════════════════ */
+#cta {
+  min-height: 80vh; padding: 7rem 2rem;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(26,110,173,0.25) 0%, transparent 70%),
+    var(--abyss);
+  position: relative; overflow: hidden;
+}
+/* Animated water circles */
+.water-circle {
+  position: absolute; border-radius: 50%; border: 1px solid rgba(46,139,192,0.12);
+  animation: expand-circle 8s linear infinite;
+}
+@keyframes expand-circle {
+  from { transform: scale(0); opacity: 0.6; }
+  to   { transform: scale(3); opacity: 0; }
+}
+
+.cta-title {
+  font-family: var(--serif); font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 700; color: var(--white); margin-bottom: 1.2rem; position: relative;
+}
+.cta-sub { font-size: 1.1rem; color: var(--mist); max-width: 580px; line-height: 1.9; margin-bottom: 3rem; position: relative; }
+.cta-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 860px; margin: 0 auto 3rem; position: relative; }
+.cta-pillar {
+  padding: 1.5rem; border-radius: 16px; text-align: center;
+  background: rgba(4,21,37,0.8); border: 1px solid rgba(46,139,192,0.15);
+  transition: all 0.3s;
+}
+.cta-pillar:hover { border-color: rgba(46,139,192,0.4); transform: translateY(-4px); }
+.pillar-icon { font-size: 2rem; margin-bottom: 0.75rem; display: block; }
+.pillar-title { font-weight: 700; color: var(--white); margin-bottom: 0.3rem; font-size: 0.95rem; }
+.pillar-text { font-size: 0.8rem; color: rgba(176,223,240,0.6); line-height: 1.6; }
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 0.75rem;
+  background: var(--current); color: white; font-family: var(--sans);
+  font-size: 1rem; font-weight: 700; padding: 1rem 2.5rem;
+  border-radius: 100px; border: none; cursor: pointer;
+  text-decoration: none; transition: all 0.3s; position: relative;
+  box-shadow: 0 4px 20px rgba(26,110,173,0.4);
+}
+.cta-btn:hover { background: var(--flow); transform: scale(1.04); box-shadow: 0 8px 30px rgba(46,139,192,0.5); }
+
+/* ═══════════════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════════════ */
+footer {
+  background: #010a10; padding: 2rem;
+  border-top: 1px solid rgba(46,139,192,0.1);
+  text-align: center; font-family: var(--mono);
+  font-size: 0.68rem; color: rgba(123,196,224,0.35);
+  line-height: 2;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════ */
+@media(max-width: 1024px) {
+  .vision-grid { grid-template-columns: 1fr; gap: 3rem; }
+  .facts-grid { grid-template-columns: repeat(2, 1fr); }
+  .types-grid { grid-template-columns: 1fr; }
+  .water-balance { grid-template-columns: 1fr; }
+  .cta-pillars { grid-template-columns: 1fr; }
+}
+@media(max-width: 768px) {
+  nav { padding: 0 1.25rem; }
+  .nav-links { display: none; }
+  .facts-grid { grid-template-columns: 1fr; }
+  .cover-stat { min-width: 140px; padding: 1rem 1.25rem; }
+  .bc-row { grid-template-columns: 120px 1fr 60px; }
+  .bc-label { font-size: 0.75rem; }
+}
+
+/* ── WATER CANVAS ── */
+#waterCanvas {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+  opacity: 0.5;
+}
+/* ── WATER DROP SVG DECORATION ── */
+.water-drop-deco {
+  position: absolute; pointer-events: none;
+  opacity: 0.06; animation: dropFloat 12s ease-in-out infinite;
+}
+@keyframes dropFloat {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  33%     { transform: translateY(-30px) rotate(5deg); }
+  66%     { transform: translateY(15px) rotate(-3deg); }
+}
+/* ── RIPPLE RING ── */
+.ripple-ring {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  border: 1px solid rgba(26,127,212,0.4);
+  animation: ringExpand 3s ease-out infinite;
+}
+@keyframes ringExpand {
+  0%   { transform: scale(0.8); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+
+/* ── SECTION HEADINGS ── */
+h1,h2 { line-height: 1.15; }
+
+/* Gradient heading utility */
+.grad-heading {
+  background: linear-gradient(135deg, var(--white) 0%, var(--foam) 50%, var(--teal) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(26,127,212,0.3));
+}
+
+/* Section glow divider */
+.section-glow-line {
+  width: 80px; height: 2px; margin: 1.5rem auto;
+  background: linear-gradient(90deg, transparent, var(--flow), var(--teal), transparent);
+  border-radius: 2px;
+  animation: shimmerMove 3s ease-in-out infinite;
+}
+
+/* Enhanced tag glow */
+.tag-blue  { box-shadow: 0 0 20px rgba(26,127,212,0.15); }
+.tag-gold  { box-shadow: 0 0 20px rgba(232,192,64,0.12); }
+.tag-coral { box-shadow: 0 0 20px rgba(232,64,64,0.12); }
+.tag-teal  { background:rgba(0,200,216,0.12); color:var(--teal); border:1px solid rgba(0,200,216,0.3); box-shadow:0 0 20px rgba(0,200,216,0.12); }
+
+/* Fact card glow */
+.fact-card {
+  transition: transform 0.35s, box-shadow 0.35s, border-color 0.35s !important;
+}
+.fact-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 0 50px rgba(26,127,212,0.25) !important;
+  border-color: rgba(26,127,212,0.5) !important;
+}
+
+/* NRW bar glow */
+.bc-fill {
+  box-shadow: 2px 0 12px rgba(26,127,212,0.3) !important;
+}
+
+/* Type card glow on hover */
+.type-head { transition: filter 0.3s; }
+.type-head:hover { filter: brightness(1.15); }
+
+</style>
+</head>
+<body>
+
+<canvas id="waterCanvas"></canvas>
+<script>
+/* ── WATER PARTICLE SYSTEM ── */
+(function(){
+  const cvs = document.getElementById('waterCanvas');
+  const ctx  = cvs.getContext('2d');
+  let W, H;
+
+  function resize(){
+    W = cvs.width  = window.innerWidth;
+    H = cvs.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  /* ── Floating micro-particles ── */
+  const PCOLS = [
+    'rgba(26,127,212,',   'rgba(0,200,216,',
+    'rgba(85,174,224,',   'rgba(18,85,160,',
+    'rgba(0,229,255,',
+  ];
+
+  class Particle {
+    constructor(){ this.reset(true); }
+    reset(init){
+      this.x   = Math.random() * W;
+      this.y   = init ? Math.random() * H : H + 6;
+      this.r   = Math.random() * 1.8 + 0.3;
+      this.vx  = (Math.random() - 0.5) * 0.25;
+      this.vy  = -(Math.random() * 0.5 + 0.12);
+      this.a   = Math.random() * 0.35 + 0.05;
+      this.col = PCOLS[Math.floor(Math.random() * PCOLS.length)];
+      this.life= 0;
+      this.max = Math.random() * 350 + 180;
+      this.wave= Math.random() * Math.PI * 2;
+    }
+    step(){
+      this.wave += 0.025;
+      this.x += this.vx + Math.sin(this.wave) * 0.28;
+      this.y += this.vy;
+      this.life++;
+      if(this.y < -8 || this.life > this.max) this.reset(false);
+    }
+    draw(){
+      const fade = this.life < 40 ? this.life/40 :
+                   this.life > this.max - 40 ? (this.max - this.life)/40 : 1;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+      ctx.fillStyle = this.col + (this.a * fade).toFixed(3) + ')';
+      ctx.fill();
+    }
+  }
+
+  /* ── Rising bubbles ── */
+  class Bubble {
+    constructor(){ this.reset(true); }
+    reset(init){
+      this.x    = Math.random() * W;
+      this.y    = init ? Math.random() * H : H + 10;
+      this.r    = Math.random() * 5 + 1.5;
+      this.vy   = -(Math.random() * 0.55 + 0.15);
+      this.vx   = (Math.random() - 0.5) * 0.3;
+      this.a    = Math.random() * 0.10 + 0.03;
+      this.wob  = Math.random() * Math.PI * 2;
+    }
+    step(){
+      this.wob += 0.028;
+      this.x += this.vx + Math.sin(this.wob) * 0.45;
+      this.y += this.vy;
+      if(this.y < -8) this.reset(false);
+    }
+    draw(){
+      /* bubble ring */
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(85,174,224,' + this.a + ')';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+      /* specular */
+      ctx.beginPath();
+      ctx.arc(this.x - this.r*0.32, this.y - this.r*0.32, this.r*0.22, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(255,255,255,' + (this.a * 1.8) + ')';
+      ctx.fill();
+    }
+  }
+
+  /* ── Slow wave bands at bottom ── */
+  let wt = 0;
+  function drawWaves(){
+    wt += 0.006;
+    const bands = [
+      { yf:0.88, amp:8,  freq:0.007, col:'rgba(18,85,160,0.055)',  spd: 1.0 },
+      { yf:0.92, amp:10, freq:0.005, col:'rgba(0,200,216,0.045)',   spd:-0.8 },
+      { yf:0.96, amp:6,  freq:0.009, col:'rgba(26,127,212,0.07)',   spd: 1.3 },
+      { yf:1.00, amp:4,  freq:0.012, col:'rgba(4,28,48,0.5)',       spd:-1.1 },
+    ];
+    bands.forEach(b => {
+      const baseY = H * b.yf;
+      ctx.beginPath();
+      ctx.moveTo(0, baseY);
+      for(let x = 0; x <= W; x += 3){
+        const y = baseY
+          + Math.sin(x * b.freq + wt * b.spd * 5) * b.amp
+          + Math.sin(x * b.freq * 1.7 + wt * b.spd * 3) * b.amp * 0.45;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+      ctx.fillStyle = b.col; ctx.fill();
+    });
+  }
+
+  /* ── Glow orbs ── */
+  const orbs = [
+    { x:0.15, y:0.25, r:220, col:'rgba(18,85,160,0.06)', vx:0.00008, vy:0.00005 },
+    { x:0.80, y:0.55, r:280, col:'rgba(0,200,216,0.04)', vx:-0.00006,vy:0.00007 },
+    { x:0.50, y:0.80, r:180, col:'rgba(18,85,160,0.05)', vx:0.00005, vy:-0.00008 },
+  ];
+  function drawOrbs(){
+    orbs.forEach(o => {
+      o.x = (o.x + o.vx + 1) % 1;
+      o.y = (o.y + o.vy + 1) % 1;
+      const grd = ctx.createRadialGradient(o.x*W, o.y*H, 0, o.x*W, o.y*H, o.r);
+      grd.addColorStop(0, o.col);
+      grd.addColorStop(1, 'transparent');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+    });
+  }
+
+  /* ── Init ── */
+  const particles = Array.from({length: 90},  () => new Particle());
+  const bubbles   = Array.from({length: 45},  () => new Bubble());
+
+  function loop(){
+    ctx.clearRect(0, 0, W, H);
+    drawOrbs();
+    drawWaves();
+    particles.forEach(p => { p.step(); p.draw(); });
+    bubbles.forEach(b   => { b.step(); b.draw(); });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+</script>
+
+<!-- RIPPLE CURSOR -->
+<script>
+document.addEventListener('click', e => {
+  const r = document.createElement('div');
+  r.className = 'ripple';
+  r.style.left = e.clientX + 'px';
+  r.style.top = e.clientY + 'px';
+  document.body.appendChild(r);
+  setTimeout(() => r.remove(), 600);
+});
+</script>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <div class="nav-brand">
+    <div class="nav-brand-dot"></div>
+    TEKLABZ · NRW PLATFORM
+  </div>
+  <ul class="nav-links">
+    <li><a href="#vision">رؤية 2040</a></li>
+    <li><a href="#jordan">واقع الأردن</a></li>
+    <li><a href="#nrw-explainer">ما هو NRW</a></li>
+    <li><a href="#webmap-section">الخريطة</a></li>
+    <li><a href="#dma-section">مناطق DMA</a></li>
+    <li><a href="#dashboard-section">لوحة التحكم</a></li>
+    <li><a href="#manila">مانيلا</a></li>
+    <li><a href="#impact">الأثر</a></li>
+    <li><a href="#teklabz">تيكلابز</a></li>
+  </ul>
+</nav>
+<div class="nav-progress" id="progress-bar"></div>
+
+<!-- ════════════════════════════════════════════════════════
+     1. COVER
+════════════════════════════════════════════════════════ -->
+<section id="cover">
+  <div class="water-lines">
+    <div class="water-line"></div><div class="water-line"></div>
+    <div class="water-line"></div><div class="water-line"></div>
+    <div class="water-line"></div>
+  </div>
+
+  <div class="cover-ministry">
+    <span></span>
+    وزارة المياه والري — المملكة الأردنية الهاشمية
+  </div>
+
+  <div class="cover-eyebrow">NON-REVENUE WATER · NRW REDUCTION PLATFORM</div>
+
+  <h1 class="cover-title">المياه غير المدرة<br>للإيرادات</h1>
+  <div class="cover-title-en">Non-Revenue Water — Al-Shmesani Demo, Amman</div>
+
+  <p class="cover-lead">
+    منصة ذكية تجمع نمذجة GIS وربط العدادات وتقسيم مناطق DMA لتحويل شبكة المياه الأردنية
+    من شبكة غير مرئية إلى شبكة قابلة للإدارة والقياس — على طريق تحقيق رؤية 2040
+  </p>
+
+  <div class="cover-stats">
+    <div class="cover-stat">
+      <span class="stat-val red" id="s1">0</span>
+      <span class="stat-unit">%</span>
+      <div class="stat-lbl">نسبة الفاقد الوطنية</div>
+    </div>
+    <div class="cover-stat">
+      <span class="stat-val" id="s2">0</span>
+      <span class="stat-unit">م³/سنة للفرد</span>
+      <div class="stat-lbl">نصيب الفرد من المياه</div>
+    </div>
+    <div class="cover-stat">
+      <span class="stat-val gold" id="s3">0</span>
+      <span class="stat-unit">%</span>
+      <div class="stat-lbl">هدف NRW بحلول 2040</div>
+    </div>
+    <div class="cover-stat">
+      <span class="stat-val green" id="s4">0</span>
+      <span class="stat-unit">M$ سنوياً</span>
+      <div class="stat-lbl">وفورات محتملة</div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">اسحب للأسفل</div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     2. JORDAN VISION 2040
+════════════════════════════════════════════════════════ -->
+<section id="vision">
+  <div class="vision-grid">
+    <div>
+      <div class="section-tag tag-gold reveal">الاستراتيجية الوطنية</div>
+      <h2 class="vision-heading reveal reveal-delay-1">
+        رؤية الأردن<br>للمياه <span>2040</span>
+      </h2>
+      <p class="vision-text reveal reveal-delay-2">
+        أطلقت وزارة المياه والري في أيار 2022 الاستراتيجية الوطنية لتخفيض المياه غير المدرة للإيرادات (2022-2040)، بالشراكة مع USAID وبنك الأهلي الدولي، بهدف تحويل قطاع المياه الأردني نحو الاستدامة المالية والتشغيلية.
+      </p>
+
+      <div class="vision-targets reveal reveal-delay-3">
+        <div 
+        <div class="target-row">
+          <div class="target-icon gold">🎯</div>
+          <div>
+            <div class="target-val gold-c">25%</div>
+            <div class="target-desc">الاستراتيجية الوطنية 2022-2040</div>
+          </div>
+        </div>
+        <div class="target-row">
+          <div class="target-icon green">💰</div>
+          <div>
+            <div class="target-val green-c">$42M</div>
+            <div class="target-desc">وفورات سنوية محتملة عند تحقيق الهدف (47% ← 25%)</div>
+          </div>
+        </div>
+        <div class="target-row">
+          <div class="target-icon coral">🏛</div>
+          <div>
+            <div class="target-val coral-c">IFC</div>
+            <div class="target-desc">اتفاقية IFC + مياهنا يونيو 2024 لتخفيض الفاقد في عمان</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-tag tag-blue reveal">المسار الزمني</div>
+      <div class="timeline reveal reveal-delay-1">
+        <div class="timeline-item">
+          <div class="timeline-year">2016</div>
+          <div class="timeline-title">الاستراتيجية الوطنية الأولى للمياه</div>
+          <div class="timeline-desc">هدف تخفيض NRW بـ 3-6% سنوياً — الوصول لـ 30% بحلول 2025</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2022 مايو</div>
+          <div class="timeline-title">إطلاق استراتيجية NRW الوطنية المحدّثة</div>
+          <div class="timeline-desc">بالشراكة مع USAID WGA — تغطي جميع المحافظات الأردنية بخطط عمل مخصصة</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2022 نوفمبر</div>
+          <div class="timeline-title">خارطة الطريق للاستدامة المالية للقطاع</div>
+          <div class="timeline-desc">اعتمدها مجلس الوزراء — إصلاح هيكل التعرفة والاستثمار في البنية التحتية</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2023</div>
+          <div class="timeline-title">إنشاء وحدة NRW المركزية في WAJ</div>
+          <div class="timeline-desc">لمراقبة التقدم وتعديل الاستراتيجيات على المستوى الوطني</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2024 يونيو</div>
+          <div class="timeline-title">اتفاقية IFC + مياهنا + حكومة الأردن</div>
+          <div class="timeline-desc">شراكة لتخفيض الفاقد في عمان الكبرى — 6 مليون مستفيد</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2040</div>
+          <div class="timeline-title">الهدف النهائي: NRW ≤ 25%</div>
+          <div class="timeline-desc">تحويل قطاع المياه الأردني نحو الاستدامة الكاملة</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     3. JORDAN WATER CRISIS
+════════════════════════════════════════════════════════ -->
+<section id="jordan">
+  <div class="jordan-inner">
+    <div class="jordan-section-head reveal">
+      <div class="section-tag tag-coral">واقع الأردن المائي</div>
+      <h2 class="jordan-title">ثاني أفقر دول العالم بالمياه</h2>
+      <p class="jordan-lead">
+        الأردن يواجه أزمة مائية هيكلية مزدوجة — شُح الموارد الطبيعية وارتفاع نسب الفاقد. كل قطرة ماء تضيع تُكلّف الاقتصاد الأردني وتُهدد استقرار المجتمع.
+      </p>
+    </div>
+
+    <div class="facts-grid">
+      <div class="fact-card reveal" style="--card-accent:var(--coral)">
+        <span class="fact-num" style="color:var(--coral)" data-target="2">0</span>
+        <div class="fact-label">المرتبة عالمياً في شُح المياه</div>
+        <div class="fact-desc">الأردن الثاني عالمياً في ندرة المياه وفق UNICEF 2024</div>
+        <div class="fact-source">المصدر: UNICEF Jordan 2024</div>
+      </div>
+      <div class="fact-card reveal reveal-delay-1" style="--card-accent:var(--amber)">
+        <span class="fact-num" style="color:var(--amber)" data-target="97">0</span>
+        <div class="fact-label">م³ للفرد سنوياً</div>
+        <div class="fact-desc">مقابل حد الشُح الدولي 500 م³ — أي أقل من 20% من المعيار</div>
+        <div class="fact-source">المصدر: World Bank 2023</div>
+      </div>
+      <div class="fact-card reveal reveal-delay-2" style="--card-accent:var(--coral)">
+        <span class="fact-num" style="color:var(--coral)" data-target="50">0</span>
+        <div class="fact-label">% نسبة NRW الوطنية</div>
+        <div class="fact-desc">نصف المياه المضخوخة في الأردن تضيع دون إيراد — 2022</div>
+        <div class="fact-source">المصدر: JSF Water Report 2024</div>
+      </div>
+      <div class="fact-card reveal reveal-delay-1" style="--card-accent:var(--gold)">
+        <span class="fact-num" style="color:var(--gold)" data-target="14">0</span>
+        <div class="fact-label">% خسارة GDP بحلول 2050</div>
+        <div class="fact-desc">إذا استمرت الأزمة — الماء يتحول إلى عائق اقتصادي رئيسي</div>
+        <div class="fact-source">المصدر: JSF Water Report 2024</div>
+      </div>
+      <div class="fact-card reveal reveal-delay-2" style="--card-accent:var(--flow)">
+        <span class="fact-num" style="color:var(--flow)" data-target="56">0</span>
+        <div class="fact-label">% NRW في الزرقاء</div>
+        <div class="fact-desc">أعلى محافظة في نسبة الفاقد — متوسط 10 سنوات</div>
+        <div class="fact-source">المصدر: ResearchGate 2022</div>
+      </div>
+      <div class="fact-card reveal reveal-delay-3" style="--card-accent:var(--green)">
+        <span class="fact-num" style="color:var(--green)" data-target="2">0</span>
+        <div class="fact-label">M$ لكل 1% تخفيض</div>
+        <div class="fact-desc">عائد مباشر على الميزانية الأردنية من كل نقطة تخفيض في NRW</div>
+        <div class="fact-source">المصدر: Jordan Economic Forum</div>
+      </div>
+    </div>
+
+    <div class="nrw-bar-section reveal">
+      <div class="nrw-bar-title">مقارنة نسب NRW — الأردن مقابل المعايير العالمية</div>
+      <div class="bar-compare">
+        <div class="bc-row">
+          <div class="bc-label">الزرقاء (أعلى محافظة)</div>
+          <div class="bc-track"><div class="bc-fill" style="width:56%;background:linear-gradient(90deg,#922b21,var(--coral))">56%</div></div>
+          <div class="bc-val" style="color:var(--coral)">56%</div>
+        </div>
+        <div class="bc-row">
+          <div class="bc-label">المتوسط الوطني (الأردن)</div>
+          <div class="bc-track"><div class="bc-fill" style="width:50%;background:var(--coral)">50%</div></div>
+          <div class="bc-val" style="color:var(--coral)">50%</div>
+        </div>
+        <div class="bc-row">
+          <div class="bc-label">هدف الأردن 2040</div>
+          <div class="bc-track"><div class="bc-fill" style="width:25%;background:var(--gold)">25%</div></div>
+          <div class="bc-val" style="color:var(--gold)">25%</div>
+        </div>
+        <div class="bc-row">
+          <div class="bc-label">معيار WHO</div>
+          <div class="bc-track"><div class="bc-fill" style="width:25%;background:var(--green)">25%</div></div>
+          <div class="bc-val" style="color:var(--green)">25%</div>
+        </div>
+        <div class="bc-row">
+          <div class="bc-label">مانيلا، الفلبين (قبل GIS)</div>
+          <div class="bc-track"><div class="bc-fill" style="width:63%;background:linear-gradient(90deg,#922b21,var(--coral))">63%</div></div>
+          <div class="bc-val" style="color:var(--coral)">63%</div>
+        </div>
+        <div class="bc-row">
+          <div class="bc-label">مانيلا، الفلبين (بعد GIS)</div>
+          <div class="bc-track"><div class="bc-fill" style="width:18%;background:var(--flow)">18%</div></div>
+          <div class="bc-val" style="color:var(--flow)">18%</div>
+        </div>
+        <div class="bc-row">
+          <div class="bc-label">أفضل الممارسات الدولية</div>
+          <div class="bc-track"><div class="bc-fill" style="width:10%;background:var(--green)">10%</div></div>
+          <div class="bc-val" style="color:var(--green)">10%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     4. WHAT IS NRW
+════════════════════════════════════════════════════════ -->
+<section id="nrw-explainer">
+  <div class="explainer-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="section-tag tag-blue">الأساس المعرفي</div>
+      <h2 class="explainer-title">ما هي المياه غير المدرة للإيرادات؟</h2>
+      <p class="explainer-lead">
+        NRW هي الفجوة بين المياه المضخوخة في الشبكة والمياه المُفوترة للمشتركين.
+        هذه الفجوة ترصد ثلاثة أنواع من الخسائر — لكل نوع أسبابه وأدوات كشفه.
+      </p>
+    </div>
+
+    <div class="water-balance reveal">
+      <div class="wb-col" style="background:#deeef7;border-radius:12px 0 0 12px">
+        <div class="wb-label" style="color:#2e5a7a">المدخل</div>
+        <div class="wb-num" style="color:var(--current)">100%</div>
+        <div class="wb-desc" style="color:#2e5a7a">إجمالي المياه المضخوخة في نظام التوزيع</div>
+      </div>
+      <div class="wb-col" style="background:#d0ede0;border-radius:0">
+        <div class="wb-label" style="color:#1a5c38">المُفوتر ← الإيراد</div>
+        <div class="wb-num" style="color:var(--green)">~50-55%</div>
+        <div class="wb-desc" style="color:#1a5c38">مياه تصل للمشترك وتُقرأ وتُفوتر ← إيراد فعلي للشركة</div>
+      </div>
+      <div class="wb-col" style="background:#fbe8e5;border-radius:0 12px 12px 0">
+        <div class="wb-label" style="color:#8b1c0f">الفاقد ← NRW</div>
+        <div class="wb-num" style="color:var(--coral)">~45-50%</div>
+        <div class="wb-desc" style="color:#8b1c0f">
+          المياه الضائعة التي لا تُدرّ إيراداً — تُقسّم إلى 3 أنواع:
+          خسائر حقيقية + خسائر ظاهرة + استهلاك مُرخص غير مُفوتر
+        </div>
+      </div>
+    </div>
+
+    <div class="types-grid reveal" style="margin-top:2rem">
+      <div class="type-card">
+        <div class="type-head" style="background:linear-gradient(135deg,#8b1c0f,var(--coral))">
+          <div class="type-num">النوع الأول · Physical Losses</div>
+          <div class="type-title">الخسائر الحقيقية</div>
+        </div>
+        <div class="type-body">
+          <div class="type-pct" style="color:var(--coral)">~60%</div>
+          <div class="type-desc">تسرب فيزيائي من الأنابيب والوصلات والخزانات — تحت الأرض أو فوقها — ماء يُضخّ لكنه لا يصل أحداً.</div>
+          <div class="type-examples">
+            <div class="type-example">انفجار أنابيب متهالكة</div>
+            <div class="type-example">تسرب وصلات تالفة</div>
+            <div class="type-example">تسرب خزانات غير محكمة</div>
+            <div class="type-example solution" style="border-right-color:var(--coral)">كشف: صوتي + تحليل التدفق الليلي</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="type-card">
+        <div class="type-head" style="background:linear-gradient(135deg,#7c4a00,var(--amber))">
+          <div class="type-num">النوع الثاني · Apparent Losses</div>
+          <div class="type-title">الخسائر الظاهرة</div>
+        </div>
+        <div class="type-body">
+          <div class="type-pct" style="color:var(--amber)">~27%</div>
+          <div class="type-desc">الماء يصل لكن لا يُحتسب بشكل صحيح — سرقة أو عداد معطل أو خطأ في الفوترة.</div>
+          <div class="type-examples">
+            <div class="type-example">وصلات غير قانونية بلا عداد</div>
+            <div class="type-example">عدادات بالية أو معطلة</div>
+            <div class="type-example">أخطاء في الفوترة والقراءة</div>
+            <div class="type-example solution" style="border-right-color:var(--amber)">كشف: مطابقة AMI + DMA delta</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="type-card">
+        <div class="type-head" style="background:linear-gradient(135deg,#0a3a5a,var(--current))">
+          <div class="type-num">النوع الثالث · Authorized Unbilled</div>
+          <div class="type-title">استهلاك مُرخص غير مُفوتر</div>
+        </div>
+        <div class="type-body">
+          <div class="type-pct" style="color:var(--flow)">~13%</div>
+          <div class="type-desc">ماء يُستهلك بشكل رسمي ومُرخص لكنه لا يُفوتر — جزء ضروري من التشغيل.</div>
+          <div class="type-examples">
+            <div class="type-example">غسيل الخطوط وتطهيرها</div>
+            <div class="type-example">إطفاء الحرائق</div>
+            <div class="type-example">مياه الشوارع والحدائق</div>
+            <div class="type-example solution" style="border-right-color:var(--flow)">تخفيض: توثيق + ترشيد الاستخدام</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     5. WEB MAP
+════════════════════════════════════════════════════════ -->
+<section id="webmap-section">
+  <div class="webmap-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="section-tag tag-blue">الخريطة التفاعلية</div>
+      <h2 style="font-family:var(--serif);font-size:clamp(2rem,4.5vw,3rem);font-weight:700;margin-bottom:0.8rem;background:linear-gradient(135deg,var(--white),var(--foam),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent">شبكة المياه — الشميساني، عمّان</h2><div class="section-glow-line"></div>
+      <p style="color:var(--mist);font-size:1rem;max-width:600px;margin:0 auto;line-height:1.9">
+        خريطة تفاعلية حية لشبكة توزيع المياه في الشميساني — انقر على أي منطقة أو أصل لعرض بيانات الفاقد
+      </p>
+    </div>
+
+    <!-- Description cards — centered 2 col -->
+    <div class="reveal" style="
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:1.5rem; margin:2.5rem auto 0;
+      max-width:800px; text-align:center">
+
+      <!-- Card 1 -->
+      <div style="
+        background:linear-gradient(145deg,rgba(18,85,160,0.18),rgba(0,200,216,0.06));
+        border:1px solid rgba(26,127,212,0.3); border-radius:20px;
+        padding:1.75rem 1.5rem;
+        box-shadow:0 4px 30px rgba(18,85,160,0.15), inset 0 1px 0 rgba(255,255,255,0.05);
+        transition:transform 0.3s,box-shadow 0.3s"
+        onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 12px 50px rgba(18,85,160,0.3),inset 0 1px 0 rgba(255,255,255,0.08)'"
+        onmouseout="this.style.transform='';this.style.boxShadow='0 4px 30px rgba(18,85,160,0.15),inset 0 1px 0 rgba(255,255,255,0.05)'">
+        <div style="font-size:2rem;margin-bottom:0.75rem;filter:drop-shadow(0 0 12px rgba(26,127,212,0.6))">🗺️</div>
+        <div style="font-weight:700;color:var(--white);margin-bottom:0.6rem;font-size:1rem;letter-spacing:0.02em">ماذا تُظهر الخريطة؟</div>
+        <div style="font-size:0.85rem;color:var(--mist);line-height:1.8">
+          جميع أصول شبكة المياه — الأنابيب والصمامات والعدادات — موزعة على 13 منطقة DMA مع ترميز لوني حسب نسبة الفاقد
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div style="
+        background:linear-gradient(145deg,rgba(18,85,160,0.18),rgba(0,200,216,0.06));
+        border:1px solid rgba(26,127,212,0.3); border-radius:20px;
+        padding:1.75rem 1.5rem;
+        box-shadow:0 4px 30px rgba(18,85,160,0.15), inset 0 1px 0 rgba(255,255,255,0.05);
+        transition:transform 0.3s,box-shadow 0.3s"
+        onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 12px 50px rgba(18,85,160,0.3),inset 0 1px 0 rgba(255,255,255,0.08)'"
+        onmouseout="this.style.transform='';this.style.boxShadow='0 4px 30px rgba(18,85,160,0.15),inset 0 1px 0 rgba(255,255,255,0.05)'">
+        <div style="font-size:2rem;margin-bottom:0.75rem;filter:drop-shadow(0 0 12px rgba(26,127,212,0.5))">🎨</div>
+        <div style="font-weight:700;color:var(--white);margin-bottom:0.6rem;font-size:1rem;letter-spacing:0.02em">دلالة الألوان</div>
+        <div style="font-size:0.85rem;color:var(--mist);line-height:1.9">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#e84040;margin-left:4px;vertical-align:middle;box-shadow:0 0 6px #e84040"></span> حرج ≥45%
+          &emsp;
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#f09000;margin-left:4px;vertical-align:middle;box-shadow:0 0 6px #f09000"></span> ضعيف
+          <br><br>
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#e8c040;margin-left:4px;vertical-align:middle;box-shadow:0 0 6px #e8c040"></span> متوسط
+          &emsp;
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#18c870;margin-left:4px;vertical-align:middle;box-shadow:0 0 6px #18c870"></span> جيد
+        </div>
+      </div>
+
+    </div>
+
+    <div class="map-embed reveal">
+      <iframe
+        src="https://teklabz-edn.maps.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=01c7eed759344fc6a717059a44a37fd8&theme=light&legend=true&basemaps=true&center=35.89167904820505,31.968702728969156&scale=2256.994353"
+        title="خريطة شبكة المياه — الشميساني"
+        allowfullscreen loading="lazy">
+      </iframe>
+      <div class="map-footer">
+        <span>Water_AlShmesani · ArcGIS Online · Teklabz Consulting 2026</span>
+        <a href="https://teklabz-edn.maps.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=01c7eed759344fc6a717059a44a37fd8&theme=light&legend=true&basemaps=true&center=35.89167904820505,31.968702728969156&scale=2256.994353" target="_blank">فتح في نافذة كاملة ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     6. DMA ZONES
+════════════════════════════════════════════════════════ -->
+<section id="dma-section">
+  <div class="dma-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="section-tag tag-gold">تقسيم المناطق</div>
+      <h2 style="font-family:var(--serif);font-size:clamp(2rem,4.5vw,3rem);font-weight:700;margin-bottom:0.8rem;background:linear-gradient(135deg,var(--white),var(--gold),var(--amber));-webkit-background-clip:text;-webkit-text-fill-color:transparent">13 منطقة DMA — الشميساني</h2><div class="section-glow-line" style="background:linear-gradient(90deg,transparent,var(--gold),var(--amber),transparent)"></div>
+      <p style="color:var(--mist);font-size:1rem;max-width:640px;margin:0 auto;line-height:1.9">
+        كل منطقة معزولة هيدروليكياً بصمامات تحكم — عداد واحد عند المدخل يقيس الفاقد بدقة يومية
+      </p>
+    </div>
+
+    <!-- Description cards — DMA -->
+    <div class="reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin:2.5rem auto 0;max-width:1100px">
+
+      <div style="
+        background:linear-gradient(145deg,rgba(201,168,76,0.12),rgba(232,192,64,0.04));
+        border:1px solid rgba(201,168,76,0.3); border-radius:20px; padding:2rem 1.5rem;
+        text-align:center;
+        box-shadow:0 4px 30px rgba(201,168,76,0.08),inset 0 1px 0 rgba(255,255,255,0.04);
+        transition:transform 0.3s,box-shadow 0.3s"
+        onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 16px 50px rgba(201,168,76,0.18)'"
+        onmouseout="this.style.transform='';this.style.boxShadow='0 4px 30px rgba(201,168,76,0.08)'">
+        <div style="font-size:2.2rem;margin-bottom:1rem;filter:drop-shadow(0 0 14px rgba(232,192,64,0.5))">🔷</div>
+        <div style="font-weight:700;color:var(--gold);margin-bottom:0.6rem;font-size:0.95rem;letter-spacing:0.03em">ما هي مناطق DMA؟</div>
+        <div style="font-size:0.84rem;color:var(--mist);line-height:1.85">
+          تقسيم الشبكة إلى 13 منطقة معزولة هيدروليكياً — عداد رئيسي عند مدخل كل منطقة يقيس المياه الداخلة ويحسب الفاقد يومياً
+        </div>
+      </div>
+
+      <div style="
+        background:linear-gradient(145deg,rgba(201,168,76,0.12),rgba(232,192,64,0.04));
+        border:1px solid rgba(201,168,76,0.3); border-radius:20px; padding:2rem 1.5rem;
+        text-align:center;
+        box-shadow:0 4px 30px rgba(201,168,76,0.08),inset 0 1px 0 rgba(255,255,255,0.04);
+        transition:transform 0.3s,box-shadow 0.3s"
+        onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 16px 50px rgba(201,168,76,0.18)'"
+        onmouseout="this.style.transform='';this.style.boxShadow='0 4px 30px rgba(201,168,76,0.08)'">
+        <div style="font-size:2.2rem;margin-bottom:1rem;filter:drop-shadow(0 0 14px rgba(232,192,64,0.5))">📍</div>
+        <div style="font-weight:700;color:var(--gold);margin-bottom:0.6rem;font-size:0.95rem;letter-spacing:0.03em">انقر على أي منطقة</div>
+        <div style="font-size:0.84rem;color:var(--mist);line-height:1.85">
+          تظهر تفاصيل المنطقة فور النقر — نسبة الفاقد وعدد المشتركين وحالة العدادات والخسارة اليومية بالمتر المكعب والدينار
+        </div>
+      </div>
+
+      <div style="
+        background:linear-gradient(145deg,rgba(232,64,64,0.10),rgba(201,168,76,0.04));
+        border:1px solid rgba(232,64,64,0.3); border-radius:20px; padding:2rem 1.5rem;
+        text-align:center;
+        box-shadow:0 4px 30px rgba(232,64,64,0.08),inset 0 1px 0 rgba(255,255,255,0.04);
+        transition:transform 0.3s,box-shadow 0.3s"
+        onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 16px 50px rgba(232,64,64,0.18)'"
+        onmouseout="this.style.transform='';this.style.boxShadow='0 4px 30px rgba(232,64,64,0.08)'">
+        <div style="font-size:2.2rem;margin-bottom:1rem;filter:drop-shadow(0 0 14px rgba(232,64,64,0.6))">⚠️</div>
+        <div style="font-weight:700;color:var(--coral);margin-bottom:0.6rem;font-size:0.95rem;letter-spacing:0.03em">المناطق ذات الأولوية</div>
+        <div style="font-size:0.84rem;color:var(--mist);line-height:1.85">
+          المناطق الحمراء تحتاج تدخلاً فورياً — الشميساني-أ (52%) والشميساني-ط (47.5%) يمثلان أعلى نسبة فاقد مع حوادث نشطة مسجلة
+        </div>
+      </div>
+
+    </div>
+
+    <div id="leaflet-dma" class="reveal"></div>
+
+    <div class="dma-legend reveal">
+      <div class="legend-pill"><div class="legend-dot" style="background:#c0392b"></div>حرج ≥45%</div>
+      <div class="legend-pill"><div class="legend-dot" style="background:#e8930a"></div>ضعيف 30-44%</div>
+      <div class="legend-pill"><div class="legend-dot" style="background:#f5c518"></div>متوسط 20-29%</div>
+      <div class="legend-pill"><div class="legend-dot" style="background:#27ae60"></div>جيد <20%</div>
+      <div class="legend-pill"><div class="legend-dot" style="background:#f5a623;border:2px solid white"></div>عداد DMA</div>
+      <div class="legend-pill"><div class="legend-dot" style="background:#c0392b;border:2px solid white"></div>حادثة NRW</div>
+    </div>
+
+    <div class="zone-chips reveal" id="zone-chips-container"></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     7. DASHBOARD
+════════════════════════════════════════════════════════ -->
+<section id="dashboard-section">
+  <div class="dash-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="section-tag tag-blue">لوحة التحكم التفاعلية</div>
+      <h2 style="font-family:var(--serif);font-size:clamp(2rem,4.5vw,3rem);font-weight:700;margin-bottom:0.8rem;background:linear-gradient(135deg,var(--white),var(--foam),var(--flow));-webkit-background-clip:text;-webkit-text-fill-color:transparent">مراقبة NRW — بيانات حية</h2><div class="section-glow-line"></div>
+      <p style="color:var(--mist);font-size:1rem;max-width:640px;margin:0 auto;line-height:1.9">
+        لوحة تحكم متكاملة — انقر على أي منطقة لتصفية جميع المؤشرات والرسوم البيانية
+      </p>
+    </div>
+
+
+    <!-- What the dashboard shows -->
+    <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:0 auto 2rem;max-width:1100px">
+
+      <div style="background:rgba(4,21,37,0.6);border:1px solid rgba(46,139,192,0.15);border-radius:14px;padding:1.5rem">
+        <div style="font-weight:700;color:var(--flow);margin-bottom:0.75rem;font-size:0.9rem">📊 ماذا تُظهر لوحة التحكم؟</div>
+        <div style="font-size:0.83rem;color:var(--mist);line-height:1.8">
+          • خريطة حرارية تُلوّن كل منطقة DMA حسب نسبة الفاقد<br>
+          • مؤشرات KPI حية — الفاقد الإجمالي والخسائر المالية<br>
+          • رسم بياني يقارن نسب الفاقد بين المناطق الـ13<br>
+          • قائمة الحوادث النشطة مرتبة حسب الأولوية<br>
+          • حالة العدادات — نشط / مشبوه / غير قانوني / غير نشط
+        </div>
+      </div>
+
+      <div style="background:rgba(4,21,37,0.6);border:1px solid rgba(46,139,192,0.15);border-radius:14px;padding:1.5rem">
+        <div style="font-weight:700;color:var(--flow);margin-bottom:0.75rem;font-size:0.9rem">🖱 كيف تستخدمها؟</div>
+        <div style="font-size:0.83rem;color:var(--mist);line-height:1.8">
+          • انقر على أي منطقة في الخريطة لتصفية جميع الأرقام<br>
+          • الرسم البياني يرتب المناطق من الأعلى فاقداً للأقل<br>
+          • قائمة الحوادث تُظهر تفاصيل كل حادثة — الخسارة والكشف<br>
+          • فتح اللوحة في نافذة كاملة للحصول على تجربة أفضل
+        </div>
+      </div>
+
+    </div>
+    <div class="dash-embed reveal">
+      <iframe
+        src="https://www.arcgis.com/apps/dashboards/e780fcad00be4eb6b08c643cab09801f"
+        title="لوحة مراقبة NRW — الشميساني"
+        allowfullscreen loading="lazy">
+      </iframe>
+    </div>
+    <div style="text-align:center;margin-top:1rem">
+      <a href="https://www.arcgis.com/apps/dashboards/e780fcad00be4eb6b08c643cab09801f"
+         target="_blank"
+         style="color:var(--flow);font-family:var(--mono);font-size:0.75rem;text-decoration:none">
+        فتح لوحة التحكم في نافذة كاملة ↗
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     8. MANILA CASE STUDY
+════════════════════════════════════════════════════════ -->
+<section id="manila" style="min-height:100vh;padding:7rem 2rem;background:linear-gradient(180deg,#041525 0%,#062236 100%);">
+  <div style="max-width:1100px;margin:0 auto;width:100%">
+    <div class="reveal" style="text-align:center;margin-bottom:3.5rem">
+      <div class="section-tag tag-teal" style="background:rgba(10,158,130,0.15);color:#0a9e82;border:1px solid rgba(10,158,130,0.3)">مثال حقيقي</div>
+      <h2 style="font-family:var(--serif);font-size:clamp(2rem,4.5vw,3rem);font-weight:700;margin-bottom:0.8rem;color:var(--white)">مانيلا، الفلبين — كيف فعلوها</h2>
+      <p style="color:var(--mist);font-size:1rem;max-width:640px;margin:0 auto;line-height:1.9">
+        مانيلا كانت تعاني من نفس مشكلة الأردن — نسبة فاقد تتجاوز 60%. بعد تطبيق منهجية GIS + DMA، انخفض الفاقد إلى 18% في 5 سنوات.
+      </p>
+    </div>
+
+    <!-- Before / After -->
+    <div class="reveal" style="display:grid;grid-template-columns:1fr auto 1fr;gap:1.5rem;align-items:center;margin-bottom:3rem">
+      <div style="background:rgba(192,57,43,0.12);border:1px solid rgba(192,57,43,0.3);border-radius:18px;padding:2rem;text-align:center">
+        <div style="font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;color:var(--coral);text-transform:uppercase;margin-bottom:0.8rem">قبل GIS</div>
+        <div style="font-family:var(--mono);font-size:4rem;font-weight:600;color:var(--coral);line-height:1">63%</div>
+        <div style="font-size:0.9rem;color:var(--mist);margin-top:0.5rem">نسبة الفاقد</div>
+        <div style="margin-top:1rem;font-size:0.85rem;color:rgba(176,223,240,0.6);line-height:1.7">
+          سرقات واسعة النطاق<br>
+          أنابيب متهالكة<br>
+          بيانات غير موثقة<br>
+          استجابة ميدانية بطيئة
+        </div>
+      </div>
+
+      <div style="text-align:center">
+        <div style="font-size:2.5rem;color:var(--flow)">←</div>
+        <div style="font-family:var(--mono);font-size:0.68rem;color:var(--dim);margin-top:0.3rem">GIS + DMA<br>5 سنوات</div>
+      </div>
+
+      <div style="background:rgba(45,184,122,0.1);border:1px solid rgba(45,184,122,0.3);border-radius:18px;padding:2rem;text-align:center">
+        <div style="font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;color:var(--green);text-transform:uppercase;margin-bottom:0.8rem">بعد GIS</div>
+        <div style="font-family:var(--mono);font-size:4rem;font-weight:600;color:var(--green);line-height:1">18%</div>
+        <div style="font-size:0.9rem;color:var(--mist);margin-top:0.5rem">نسبة الفاقد</div>
+        <div style="margin-top:1rem;font-size:0.85rem;color:rgba(176,223,240,0.6);line-height:1.7">
+          كشف سرقات فوري<br>
+          أوامر عمل من الخريطة<br>
+          10 مليون مشترك مُدار<br>
+          استجابة بالساعات
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 stats from PPTX -->
+    <div class="reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3rem">
+      <div style="background:rgba(10,158,130,0.1);border:1px solid rgba(10,158,130,0.25);border-radius:16px;padding:1.75rem;text-align:center">
+        <div style="font-family:var(--mono);font-size:2.8rem;font-weight:600;color:#0a9e82">300%</div>
+        <div style="font-size:0.95rem;font-weight:700;color:var(--white);margin:0.5rem 0 0.3rem">تحسن في اكتشاف سرقة المياه</div>
+        <div style="font-size:0.82rem;color:var(--mist)">خلال السنة الأولى من تطبيق GIS</div>
+      </div>
+      <div style="background:rgba(45,184,122,0.1);border:1px solid rgba(45,184,122,0.25);border-radius:16px;padding:1.75rem;text-align:center">
+        <div style="font-family:var(--mono);font-size:2.8rem;font-weight:600;color:var(--green)">$410K</div>
+        <div style="font-size:0.95rem;font-weight:700;color:var(--white);margin:0.5rem 0 0.3rem">خسائر تجارية تم استردادها</div>
+        <div style="font-size:0.82rem;color:var(--mist)">من خلال كشف الوصلات غير القانونية</div>
+      </div>
+      <div style="background:rgba(46,139,192,0.1);border:1px solid rgba(46,139,192,0.25);border-radius:16px;padding:1.75rem;text-align:center">
+        <div style="font-family:var(--mono);font-size:2.8rem;font-weight:600;color:var(--flow)">10M</div>
+        <div style="font-size:0.95rem;font-weight:700;color:var(--white);margin:0.5rem 0 0.3rem">مشترك تحت إدارة GIS</div>
+        <div style="font-size:0.82rem;color:var(--mist)">شبكة مانيلا — أكبر تطبيق مائي في آسيا</div>
+      </div>
+    </div>
+
+    <!-- Quote -->
+    <div class="reveal" style="background:rgba(26,110,173,0.1);border:1px solid rgba(46,139,192,0.2);border-radius:16px;padding:2rem;text-align:center">
+      <div style="font-size:1.2rem;color:var(--white);font-style:italic;line-height:1.8;margin-bottom:0.75rem">
+        "GIS is becoming the backbone of our water operations"
+      </div>
+      <div style="font-family:var(--mono);font-size:0.75rem;color:var(--dim)">
+        — كبير مهندسي GIS في مانيلا · Esri 2023
+      </div>
+    </div>
+
+    <!-- Applicability to Jordan -->
+    <div class="reveal" style="margin-top:2rem;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:16px;padding:2rem">
+      <div style="font-size:1rem;font-weight:700;color:var(--gold);margin-bottom:1rem;text-align:center">لماذا ينطبق هذا على الأردن؟</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+        <div style="font-size:0.88rem;color:var(--mist);padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.06)">✓ نفس المشكلة: وصلات غير قانونية + أنابيب متهالكة</div>
+        <div style="font-size:0.88rem;color:var(--mist);padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.06)">✓ نفس الأداة: ArcGIS هو ما استخدمته مانيلا</div>
+        <div style="font-size:0.88rem;color:var(--mist);padding:0.5rem 0">✓ الأردن لديه استراتيجية وطنية جاهزة 2022-2040</div>
+        <div style="font-size:0.88rem;color:var(--mist);padding:0.5rem 0">✓ تيكلابز متخصصة في تطبيق هذه المنهجية إقليمياً</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     9. CALL TO ACTION
+════════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════════
+     9. MINISTRY IMPACT
+════════════════════════════════════════════════════════ -->
+<section id="impact" style="min-height:100vh;padding:7rem 2rem;background:linear-gradient(180deg,#f0f8ff 0%,#e8f4fb 100%);color:#041525">
+  <div style="max-width:1100px;margin:0 auto;width:100%">
+
+    <div class="reveal" style="text-align:center;margin-bottom:3.5rem">
+      <div class="section-tag tag-blue">للوزارة</div>
+      <h2 style="font-family:var(--serif);font-size:clamp(2rem,4.5vw,3.2rem);font-weight:700;color:#041525;margin-bottom:0.8rem">
+        الأثر المتوقع على أعمال الوزارة
+      </h2>
+      <p style="font-size:1rem;color:#2e5a7a;max-width:660px;margin:0 auto;line-height:1.9">
+        منصة موحدة تساعد الوزارة على تقليل الفاقد وتحسين كفاءة التشغيل اعتماداً على البيانات والتحليل المكاني
+      </p>
+    </div>
+
+    <!-- 6 benefits grid -->
+    <div class="reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:2.5rem">
+
+      <div style="background:white;border-radius:16px;padding:1.75rem;border:1px solid rgba(46,139,192,0.15);box-shadow:0 4px 20px rgba(0,0,0,0.07);border-top:4px solid var(--coral);transition:transform 0.3s" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:2rem;margin-bottom:0.75rem">💰</div>
+        <div style="font-size:1rem;font-weight:700;color:#041525;margin-bottom:0.5rem">تقليل الخسائر المالية</div>
+        <div style="font-size:0.88rem;color:#4a7a9b;line-height:1.7">$2M وفورات لكل 1% تخفيض في NRW — الوصول لـ 25% يعني $42M+ سنوياً للخزينة الأردنية</div>
+      </div>
+
+      <div style="background:white;border-radius:16px;padding:1.75rem;border:1px solid rgba(46,139,192,0.15);box-shadow:0 4px 20px rgba(0,0,0,0.07);border-top:4px solid var(--flow);transition:transform 0.3s" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:2rem;margin-bottom:0.75rem">🎯</div>
+        <div style="font-size:1rem;font-weight:700;color:#041525;margin-bottom:0.5rem">تحسين استهداف الصيانة</div>
+        <div style="font-size:0.88rem;color:#4a7a9b;line-height:1.7">إرسال الفرق بناءً على بيانات دقيقة — لا حفر عشوائي ولا هدر في الموارد البشرية والمالية</div>
+      </div>
+
+      <div style="background:white;border-radius:16px;padding:1.75rem;border:1px solid rgba(46,139,192,0.15);box-shadow:0 4px 20px rgba(0,0,0,0.07);border-top:4px solid #0a9e82;transition:transform 0.3s" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:2rem;margin-bottom:0.75rem">📊</div>
+        <div style="font-size:1rem;font-weight:700;color:#041525;margin-bottom:0.5rem">تحسين جودة البيانات</div>
+        <div style="font-size:0.88rem;color:#4a7a9b;line-height:1.7">شبكة موثقة رقمياً بدقة GPS — أساس لكل قرار تشغيلي واستثماري مستقبلي</div>
+      </div>
+
+      <div style="background:white;border-radius:16px;padding:1.75rem;border:1px solid rgba(46,139,192,0.15);box-shadow:0 4px 20px rgba(0,0,0,0.07);border-top:4px solid var(--amber);transition:transform 0.3s" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:2rem;margin-bottom:0.75rem">⚡</div>
+        <div style="font-size:1rem;font-weight:700;color:#041525;margin-bottom:0.5rem">رفع كفاءة التشغيل</div>
+        <div style="font-size:0.88rem;color:#4a7a9b;line-height:1.7">فرق ميدانية تعمل بأولويات واضحة وبيانات حقيقية لحظية مباشرة من لوحة التحكم</div>
+      </div>
+
+      <div style="background:white;border-radius:16px;padding:1.75rem;border:1px solid rgba(46,139,192,0.15);box-shadow:0 4px 20px rgba(0,0,0,0.07);border-top:4px solid var(--coral);transition:transform 0.3s" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:2rem;margin-bottom:0.75rem">⏱</div>
+        <div style="font-size:1rem;font-weight:700;color:#041525;margin-bottom:0.5rem">تقليل زمن الاستجابة</div>
+        <div style="font-size:0.88rem;color:#4a7a9b;line-height:1.7">من أسابيع إلى ساعات — تنبيه تلقائي فور رصد أي شذوذ في الضغط أو التدفق</div>
+      </div>
+
+      <div style="background:white;border-radius:16px;padding:1.75rem;border:1px solid rgba(46,139,192,0.15);box-shadow:0 4px 20px rgba(0,0,0,0.07);border-top:4px solid var(--current);transition:transform 0.3s" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:2rem;margin-bottom:0.75rem">🚀</div>
+        <div style="font-size:1rem;font-weight:700;color:#041525;margin-bottom:0.5rem">دعم التحول الرقمي</div>
+        <div style="font-size:0.88rem;color:#4a7a9b;line-height:1.7">ArcGIS + Dashboard — الأردن في مصاف الدول الرائدة في إدارة قطاع المياه رقمياً</div>
+      </div>
+
+    </div>
+
+    <!-- Bottom banner -->
+    <div class="reveal" style="background:linear-gradient(135deg,var(--current),#0a9e82);border-radius:16px;padding:1.75rem 2.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+      <div style="color:white;font-size:1.05rem;font-weight:600">النتيجة: وزارة مياه أقل هدراً · أكثر كفاءة · مدعومة بالبيانات</div>
+      <div style="font-family:var(--mono);font-size:1.8rem;font-weight:600;color:white">$42M+ / سنة</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     10. WHY TEKLABZ
+════════════════════════════════════════════════════════ -->
+<section id="teklabz" style="min-height:100vh;padding:7rem 2rem;background:linear-gradient(180deg,var(--deep) 0%,var(--abyss) 100%);">
+  <div style="max-width:1100px;margin:0 auto;width:100%">
+
+    <div class="reveal" style="text-align:center;margin-bottom:3.5rem">
+      <div class="section-tag tag-gold" style="background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid rgba(201,168,76,0.3)">شريككم التقني</div>
+      <h2 style="font-family:var(--serif);font-size:clamp(2rem,4.5vw,3.2rem);font-weight:700;color:var(--white);margin-bottom:0.8rem">
+        لماذا تيكلابز؟
+      </h2>
+      <p style="font-size:1rem;color:var(--mist);max-width:680px;margin:0 auto;line-height:1.9;font-style:italic">
+        تيكلابز لا تقدم نظام GIS فقط — بل تقدم منصة تشغيلية ذكية تساعد الوزارة على تقليل الفاقد، تسريع الاستجابة، وتحسين اتخاذ القرار
+      </p>
+    </div>
+
+    <!-- 3 pillars -->
+    <div class="reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3rem">
+
+      <div style="background:rgba(26,110,173,0.1);border:1px solid rgba(46,139,192,0.2);border-radius:18px;padding:2rem;transition:all 0.3s" onmouseover="this.style.borderColor='rgba(46,139,192,0.5)'" onmouseout="this.style.borderColor='rgba(46,139,192,0.2)'">
+        <div style="font-size:2.2rem;margin-bottom:1rem">🗺</div>
+        <div style="font-size:1.05rem;font-weight:700;color:var(--flow);margin-bottom:0.75rem">خبرة GIS متخصصة في شبكات المرافق</div>
+        <div style="font-size:0.88rem;color:var(--mist);line-height:1.8;margin-bottom:1rem">ArcGIS Utility Network · ArcGIS Field Maps · ENE Workflows</div>
+        <div style="height:1px;background:rgba(46,139,192,0.15);margin-bottom:1rem"></div>
+        <div style="font-family:var(--mono);font-size:0.72rem;color:var(--dim)">15 سنة خبرة في المرافق الإقليمية</div>
+      </div>
+
+      <div style="background:rgba(10,158,130,0.1);border:1px solid rgba(10,158,130,0.2);border-radius:18px;padding:2rem;transition:all 0.3s" onmouseover="this.style.borderColor='rgba(10,158,130,0.5)'" onmouseout="this.style.borderColor='rgba(10,158,130,0.2)'">
+        <div style="font-size:2.2rem;margin-bottom:1rem">🌍</div>
+        <div style="font-size:1.05rem;font-weight:700;color:#0a9e82;margin-bottom:0.75rem">خبرة مثبتة في مشاريع إقليمية</div>
+        <div style="font-size:0.88rem;color:var(--mist);line-height:1.8;margin-bottom:1rem">OBB · MOIN Jordan · STC Saudi Arabia · OETC Oman · AsiaNet Lebanon</div>
+        <div style="height:1px;background:rgba(10,158,130,0.15);margin-bottom:1rem"></div>
+        <div style="font-family:var(--mono);font-size:0.72rem;color:var(--dim)">الأردن · عُمان · السعودية · لبنان</div>
+      </div>
+
+      <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:18px;padding:2rem;transition:all 0.3s" onmouseover="this.style.borderColor='rgba(201,168,76,0.4)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.2)'">
+        <div style="font-size:2.2rem;margin-bottom:1rem">⚙️</div>
+        <div style="font-size:1.05rem;font-weight:700;color:var(--gold);margin-bottom:0.75rem">خبرة قوية في تكامل الأنظمة والبيانات</div>
+        <div style="font-size:0.88rem;color:var(--mist);line-height:1.8;margin-bottom:1rem">ربط الأنظمة المختلفة · بناء Dashboards · تحليلات مكانية · نقل البيانات وهجرتها</div>
+        <div style="height:1px;background:rgba(201,168,76,0.15);margin-bottom:1rem"></div>
+        <div style="font-family:var(--mono);font-size:0.72rem;color:var(--dim)">من البيانات الورقية إلى المنصة الذكية</div>
+      </div>
+
+    </div>
+
+    <!-- Contact CTA -->
+    <div class="reveal" style="text-align:center;padding:3rem;background:rgba(26,110,173,0.08);border:1px solid rgba(46,139,192,0.2);border-radius:20px;position:relative;overflow:hidden">
+      <div class="water-circle" style="width:300px;height:300px;top:50%;left:50%;margin:-150px;animation-delay:0s;position:absolute"></div>
+      <div class="water-circle" style="width:300px;height:300px;top:50%;left:50%;margin:-150px;animation-delay:3s;position:absolute"></div>
+      <div style="position:relative">
+        <h3 style="font-family:var(--serif);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;color:var(--white);margin-bottom:0.75rem">جاهزون للبدء</h3>
+        <p style="color:var(--mist);font-size:1rem;max-width:520px;margin:0 auto 2rem;line-height:1.8">نحدد معاً المنطقة التجريبية، نبني خطة التنفيذ، ونقدم أول نتائج DMA في 6-8 أسابيع</p>
+        <a href="mailto:info@teklabz.com" class="cta-btn" style="margin-bottom:1rem;display:inline-flex">
+          ابدأ المشروع مع تيكلابز ←
+        </a>
+        <div style="font-family:var(--mono);font-size:0.72rem;color:var(--dim);margin-top:1rem">
+          info@teklabz.com · teklabz.com · Jordan · Oman · أيار 2026
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<footer>
+  <div>المصادر: UNICEF Jordan 2024 · World Bank Water Sector Efficiency Program 2023 · USAID WGA NRW Strategy 2022 · IFC Press Release June 2024</div>
+  <div>JSF Water Report 2024 · ResearchGate — NRW Zarqa 2022 · Jordan Economic Forum 2020 · MWI National Water Strategy 2022-2040</div>
+  <div style="margin-top:0.5rem">Teklabz Consulting · GIS & Infrastructure Engineering · جميع الأرقام مستندة لمصادر رسمية — البيانات الميدانية تجريبية لأغراض العرض</div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ── PROGRESS BAR ──────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  const prog = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+  document.getElementById('progress-bar').style.width = prog + '%';
+});
+
+// ── COUNTER ANIMATION ─────────────────────────────────────────────
+function animateNum(el, target, decimals=0){
+  let cur = 0; const step = target / 70;
+  const t = setInterval(() => {
+    cur = Math.min(cur + step, target);
+    el.textContent = decimals ? cur.toFixed(1) : Math.floor(cur);
+    if(cur >= target) clearInterval(t);
+  }, 20);
+}
+setTimeout(() => {
+  animateNum(document.getElementById('s1'), 50);
+  animateNum(document.getElementById('s2'), 97);
+  animateNum(document.getElementById('s3'), 25);
+  animateNum(document.getElementById('s4'), 42);
+}, 600);
+
+// ── SCROLL REVEAL ─────────────────────────────────────────────────
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold: 0.08});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Fact card counters
+const cardObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      const num = e.target.querySelector('[data-target]');
+      if(num && !num.dataset.animated){
+        num.dataset.animated = true;
+        animateNum(num, parseFloat(num.dataset.target));
+      }
+    }
+  });
+}, {threshold: 0.3});
+document.querySelectorAll('.fact-card').forEach(el => cardObs.observe(el));
+
+// ── LEAFLET DMA MAP ───────────────────────────────────────────────
+const map = L.map('leaflet-dma', {center:[31.972, 35.889], zoom:17, zoomControl:true});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+  attribution:'© CARTO', maxZoom:19
+}).addTo(map);
+
+function nrwColor(p){
+  return p >= 45 ? '#c0392b' : p >= 30 ? '#e8930a' : p >= 20 ? '#f5c518' : '#27ae60';
+}
+
+const SERVICE = 'https://services8.arcgis.com/TCovFmB5uZBQNstp/arcgis/rest/services/Water_AlShmesani_WFL1/FeatureServer';
+
+// Load DMA zones from live service
+fetch(`${SERVICE}/4/query?where=1=1&outFields=ZONE_ID,ZONE_NAME,ZONE_NAME_AR,NRW_PCT,CUSTOMER_COUNT,CONDITION,PRIORITY,VALVE_COUNT,ANNUAL_LOSS_JD&outSR=4326&geometryPrecision=6&f=geojson`)
+  .then(r => r.json())
+  .then(data => {
+    if(!data.features?.length) return;
+    const chipsContainer = document.getElementById('zone-chips-container');
+    data.features.forEach(f => {
+      const p = f.properties;
+      const nrw = p.NRW_PCT || 0;
+      const col = nrwColor(nrw);
+      const poly = L.geoJSON(f, {
+        style:{ color:col, weight:2.5, fillColor:col, fillOpacity:0.35 }
+      }).addTo(map);
+      poly.bindPopup(`
+        <div style="font-family:Cairo,sans-serif;direction:rtl;padding:6px;min-width:210px">
+          <b style="color:${col};font-size:1rem">${p.ZONE_NAME_AR||p.ZONE_NAME||''}</b>
+          <hr style="border-color:rgba(255,255,255,0.1);margin:6px 0">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <div style="background:rgba(${col.replace('#','').match(/.{2}/g).map(x=>parseInt(x,16)).join(',')},0.15);border-radius:8px;padding:8px;text-align:center">
+              <div style="font-family:monospace;font-size:1.4rem;font-weight:700;color:${col}">${nrw}%</div>
+              <div style="font-size:0.7rem;color:#999">NRW</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:8px;text-align:center">
+              <div style="font-family:monospace;font-size:1.4rem;font-weight:700;color:#7bc4e0">${p.CUSTOMER_COUNT||0}</div>
+              <div style="font-size:0.7rem;color:#999">مشترك</div>
+            </div>
+          </div>
+          <div style="font-size:0.78rem;color:#aaa">صمامات: ${p.VALVE_COUNT||0} | الحالة: <b style="color:${col}">${p.CONDITION||'—'}</b></div>
+          ${p.ANNUAL_LOSS_JD ? `<div style="font-size:0.75rem;color:#aaa;margin-top:4px">الخسارة السنوية: JD ${Math.round(p.ANNUAL_LOSS_JD).toLocaleString()}</div>` : ''}
+        </div>
+      `, {maxWidth:250});
+
+      // Zone chip
+      const chip = document.createElement('div');
+      chip.className = 'zone-chip';
+      chip.style.cssText = `color:${col};border-color:${col}20;background:${col}12;`;
+      chip.textContent = `${p.ZONE_NAME_AR||p.ZONE_NAME||''} ${nrw}%`;
+      chip.addEventListener('click', () => {
+        map.fitBounds(poly.getBounds(), {padding:[20,20]});
+        poly.openPopup();
+      });
+      chipsContainer.appendChild(chip);
+
+      // Label
+      try {
+        const c = poly.getBounds().getCenter();
+        L.marker(c, {icon: L.divIcon({
+          html:`<div style="background:${col};color:white;padding:2px 7px;border-radius:10px;font-size:9px;font-weight:700;font-family:Cairo,sans-serif;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.5);direction:rtl">${p.ZONE_NAME_AR||''} ${nrw}%</div>`,
+          className:'',iconAnchor:[40,10]
+        })}).addTo(map);
+      } catch(e){}
+    });
+    // Fit bounds
+    const allBounds = data.features.map(f => {
+      try { return L.geoJSON(f).getBounds(); } catch(e){ return null; }
+    }).filter(Boolean);
+    if(allBounds.length) map.fitBounds(allBounds.reduce((a,b) => a.extend(b)));
+  })
+  .catch(()=>{});
+
+// System valve meters
+fetch(`${SERVICE}/1/query?where=ASSETGROUP=2&outFields=ZONE_ID_SPATIAL&outSR=4326&f=geojson`)
+  .then(r=>r.json()).then(d=>{
+    d.features?.forEach(f=>{
+      const c=f.geometry.coordinates;
+      L.circleMarker([c[1],c[0]],{radius:7,fillColor:'#f5a623',color:'white',weight:2,fillOpacity:1})
+       .bindPopup(`<div style="font-family:Cairo,sans-serif;direction:rtl">عداد دخول DMA<br>${f.properties.ZONE_ID_SPATIAL||''}</div>`)
+       .addTo(map);
+    });
+  }).catch(()=>{});
+
+// NRW Incidents
+fetch(`${SERVICE}/0/query?where=1=1&outFields=NAME_AR,PRIORITY,LOSS_RATE_LS,INCIDENT_TYPE&outSR=4326&f=geojson`)
+  .then(r=>r.json()).then(d=>{
+    d.features?.forEach(f=>{
+      const p=f.properties,c=f.geometry.coordinates;
+      const col=p.PRIORITY==='CRITICAL'?'#c0392b':'#e8930a';
+      L.circleMarker([c[1],c[0]],{radius:11,fillColor:col,color:'white',weight:2.5,fillOpacity:0.9})
+       .bindPopup(`<div style="font-family:Cairo,sans-serif;direction:rtl;padding:4px"><b style="color:${col}">🚨 ${p.PRIORITY}</b><br>${p.NAME_AR||''}<br><small>${p.LOSS_RATE_LS} L/s</small></div>`)
+       .addTo(map);
+    });
+  }).catch(()=>{});
+</script>
+</body>
+</html>
