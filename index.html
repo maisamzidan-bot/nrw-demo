@@ -218,8 +218,8 @@ section { position: relative; overflow: hidden; z-index: 1; }
   animation: fadeDown 1s 0.3s both;
 }
 .cover-title {
-  font-family: var(--serif); font-size: clamp(3rem, 8vw, 6.5rem);
-  font-weight: 700; line-height: 1.1; margin-bottom: 0.5rem;
+  font-family: var(--serif); font-size: clamp(2.6rem, 6.5vw, 5.5rem);
+  font-weight: 700; line-height: 1.3; margin-bottom: 0.5rem;
   background: linear-gradient(135deg, #e8f4fd 0%, #90caf9 35%, #29b6f6 65%, #00e5ff 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 0 30px rgba(30,136,229,0.4));
@@ -779,14 +779,13 @@ document.addEventListener('click', e => {
     <span style="font-family:var(--mono);font-size:0.65rem;color:rgba(100,181,246,0.6);letter-spacing:0.1em">NRW PLATFORM</span>
   </div>
   <ul class="nav-links">
-    <li><a href="#nrw-problem">المشكلة و NRW</a></li>
+    <li><a href="#nrw-problem">المشكلة والأسباب</a></li>
     <li><a href="#gis-approach">المنهجية</a></li>
     <li><a href="#webmap-section">الخريطة</a></li>
-    <li><a href="#dma-section">مناطق DMA</a></li>
+    <li><a href="#dma-section">تحليل البيانات</a></li>
     <li><a href="#dashboard-section">لوحة التحكم</a></li>
-    <li><a href="#manila">مانيلا</a></li>
-    <li><a href="#impact">الأثر</a></li>
-    <li><a href="#teklabz">تيكلابز</a></li>
+    <li><a href="#manila">مثال حقيقي</a></li>
+    <li><a href="#impact"> الأثر المتوقع</a></li>
   </ul>
 </nav>
 <div class="nav-progress" id="progress-bar"></div>
@@ -795,10 +794,7 @@ document.addEventListener('click', e => {
      1. COVER
 ════════════════════════════════════════════════════════ -->
 <section id="cover">
-  <video id="cover-video-bg" autoplay muted loop playsinline preload="auto"
-    poster="https://images.pexels.com/videos/3999398/pexels-photo-3999398.jpeg?auto=compress&cs=tinysrgb&h=627&fit=crop&w=1200">
-    <source src="https://videos.pexels.com/video-files/3999398/3999398-hd_1920_1080_24fps.mp4" type="video/mp4">
-  </video>
+ 
   <div class="water-lines">
     <div class="water-line"></div><div class="water-line"></div>
     <div class="water-line"></div><div class="water-line"></div>
@@ -813,6 +809,7 @@ document.addEventListener('click', e => {
   <div class="cover-eyebrow">NON-REVENUE WATER · NRW REDUCTION PLATFORM</div>
 
   <h1 class="cover-title">المياه غير المدرة<br>للإيرادات</h1>
+  <div style="height:1.5rem"></div>
   <div class="cover-title-en">Non-Revenue Water — Al-Shmesani Demo, Amman</div>
 
   <p class="cover-lead">
@@ -825,21 +822,25 @@ document.addEventListener('click', e => {
       <span class="stat-val red" id="s1">0</span>
       <span class="stat-unit">%</span>
       <div class="stat-lbl">نسبة الفاقد الوطنية</div>
+      <div style="font-family:var(--mono);font-size:0.58rem;color:rgba(176,223,240,0.35);margin-top:0.4rem">World Bank · 2023</div>
     </div>
     <div class="cover-stat">
       <span class="stat-val" id="s2">0</span>
       <span class="stat-unit">م³/سنة للفرد</span>
       <div class="stat-lbl">نصيب الفرد من المياه</div>
+      <div style="font-family:var(--mono);font-size:0.58rem;color:rgba(176,223,240,0.35);margin-top:0.4rem">UNICEF Jordan · 2024</div>
     </div>
     <div class="cover-stat">
       <span class="stat-val gold" id="s3">0</span>
       <span class="stat-unit">%</span>
       <div class="stat-lbl">هدف NRW بحلول 2040</div>
+      <div style="font-family:var(--mono);font-size:0.58rem;color:rgba(176,223,240,0.35);margin-top:0.4rem">MWI Strategy · 2022</div>
     </div>
     <div class="cover-stat">
       <span class="stat-val green" id="s4">0</span>
       <span class="stat-unit">M$ سنوياً</span>
       <div class="stat-lbl">وفورات محتملة</div>
+      <div style="font-family:var(--mono);font-size:0.58rem;color:rgba(176,223,240,0.35);margin-top:0.4rem">Jordan Economic Forum · 2020</div>
     </div>
   </div>
 
@@ -877,11 +878,13 @@ document.addEventListener('click', e => {
         <div style="font-family:var(--mono);font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);margin-bottom:0.75rem">المُفوتر ← الإيراد</div>
         <div style="font-family:var(--mono);font-size:2.8rem;font-weight:600;color:var(--green);line-height:1;margin-bottom:0.4rem">~50%</div>
         <div style="font-size:0.8rem;color:var(--mist);line-height:1.7">مياه تصل للمشترك وتُفوتر فعلياً</div>
+        <div style="font-family:var(--mono);font-size:0.58rem;color:rgba(176,223,240,0.35);margin-top:0.6rem">MWI Strategy · 2022–2040</div>
       </div>
       <div style="padding:2rem;background:linear-gradient(145deg,rgba(239,83,80,0.18),rgba(239,83,80,0.06));text-align:center">
         <div style="font-family:var(--mono);font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--coral);margin-bottom:0.75rem">الفاقد ← NRW</div>
         <div style="font-family:var(--mono);font-size:2.8rem;font-weight:600;color:var(--coral);line-height:1;margin-bottom:0.4rem">~50%</div>
         <div style="font-size:0.8rem;color:var(--mist);line-height:1.7">مياه ضائعة لا تُدرّ إيراداً — تُقسّم إلى 3 أنواع</div>
+        <div style="font-family:var(--mono);font-size:0.58rem;color:rgba(176,223,240,0.35);margin-top:0.6rem">World Bank · USAID WGA · 2023</div>
       </div>
     </div>
 
@@ -904,7 +907,7 @@ document.addEventListener('click', e => {
         <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--amber),transparent)"></div>
         <div style="font-size:2.5rem;margin-bottom:0.75rem;filter:drop-shadow(0 0 20px rgba(255,143,0,0.5))">⚡</div>
         <div style="font-family:var(--mono);font-size:0.65rem;letter-spacing:0.18em;color:var(--amber);text-transform:uppercase;margin-bottom:0.6rem">السبب الثاني</div>
-        <div style="font-size:1.05rem;font-weight:700;color:var(--white);margin-bottom:0.75rem">سرقة المياه والوصلات غير القانونية</div>
+        <div style="font-size:1.05rem;font-weight:700;color:var(--white);margin-bottom:0.75rem">وصلات غير نظامية واستهلاك غير مرخص</div>
         <div style="background:rgba(255,143,0,0.12);border-radius:8px;padding:0.6rem;font-family:var(--mono);font-size:0.82rem;color:var(--amber);margin-bottom:0.85rem">~27% من الفاقد</div>
         <div style="font-size:0.84rem;color:var(--mist);line-height:1.8">وصلات مباشرة بلا عدادات — استهلاك حقيقي لا يُفوتر ولا يُرصد في الميزانية</div>
       </div>
@@ -1118,7 +1121,7 @@ document.addEventListener('click', e => {
         <div style="font-size:1.5rem;margin-bottom:0.6rem">📍</div>
         <div style="font-weight:700;color:var(--amber);margin-bottom:0.4rem;font-size:0.95rem">مواقع الحوادث النشطة</div>
         <div style="font-size:0.85rem;color:var(--mist);line-height:1.8">
-          4 حوادث مُحددة بالموقع الدقيق على الخريطة — تسرب فيزيائي، خلل إنشائي، سرقة مياه، عبث بالعدادات
+          4 حوادث مُحددة بالموقع الدقيق على الخريطة — تسرب فيزيائي، خلل إنشائي، وصلات غير نظامية، عبث بالعدادات
         </div>
       </div>
 
@@ -1259,7 +1262,7 @@ document.addEventListener('click', e => {
         <div style="font-family:var(--mono);font-size:4rem;font-weight:600;color:var(--coral);line-height:1">63%</div>
         <div style="font-size:0.9rem;color:var(--mist);margin-top:0.5rem">نسبة الفاقد</div>
         <div style="margin-top:1rem;font-size:0.85rem;color:rgba(176,223,240,0.6);line-height:1.7">
-          سرقات واسعة النطاق<br>
+          وصلات غير نظامية واسعة النطاق<br>
           أنابيب متهالكة<br>
           بيانات غير موثقة<br>
           استجابة ميدانية بطيئة
@@ -1276,7 +1279,7 @@ document.addEventListener('click', e => {
         <div style="font-family:var(--mono);font-size:4rem;font-weight:600;color:var(--green);line-height:1">18%</div>
         <div style="font-size:0.9rem;color:var(--mist);margin-top:0.5rem">نسبة الفاقد</div>
         <div style="margin-top:1rem;font-size:0.85rem;color:rgba(176,223,240,0.6);line-height:1.7">
-          كشف سرقات فوري<br>
+          كشف وصلات غير نظامية فوري<br>
           أوامر عمل من الخريطة<br>
           10 مليون مشترك مُدار<br>
           استجابة بالساعات
@@ -1288,7 +1291,7 @@ document.addEventListener('click', e => {
     <div class="reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3rem">
       <div style="background:rgba(10,158,130,0.1);border:1px solid rgba(10,158,130,0.25);border-radius:16px;padding:1.75rem;text-align:center">
         <div style="font-family:var(--mono);font-size:2.8rem;font-weight:600;color:#0a9e82">300%</div>
-        <div style="font-size:0.95rem;font-weight:700;color:var(--white);margin:0.5rem 0 0.3rem">تحسن في اكتشاف سرقة المياه</div>
+        <div style="font-size:0.95rem;font-weight:700;color:var(--white);margin:0.5rem 0 0.3rem">تحسن في اكتشاف الوصلات غير النظامية</div>
         <div style="font-size:0.82rem;color:var(--mist)">خلال السنة الأولى من تطبيق GIS</div>
       </div>
       <div style="background:rgba(45,184,122,0.1);border:1px solid rgba(45,184,122,0.25);border-radius:16px;padding:1.75rem;text-align:center">
@@ -1410,7 +1413,7 @@ document.addEventListener('click', e => {
       <div class="water-circle" style="width:300px;height:300px;top:50%;left:50%;margin:-150px;animation-delay:0s;position:absolute"></div>
       <div class="water-circle" style="width:300px;height:300px;top:50%;left:50%;margin:-150px;animation-delay:3s;position:absolute"></div>
       <div style="position:relative">
-        <h3 style="font-family:var(--serif);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;color:var(--white);margin-bottom:0.75rem">جاهزون للبدء</h3>
+        
         <p style="color:var(--mist);font-size:1rem;max-width:520px;margin:0 auto 2rem;line-height:1.8">تيكلابز لا تقدم نظام GIS فقط — بل تقدم منصة تشغيلية ذكية تساعد الوزارة على تقليل الفاقد، تسريع الاستجابة، وتحسين اتخاذ القرار</p>
 
         </a>
@@ -1444,7 +1447,7 @@ document.addEventListener('click', e => {
 
   </div>
 
-  <div class="teklabz-watermark" style="flex-direction:column;align-items:flex-start;gap:0.2rem">
+  
     <img src="data:image/png;base64,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" alt="Teklabz" style="height:50px;width:auto;display:block;opacity:0.85">
   </div>
 </section>
